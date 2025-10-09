@@ -32,3 +32,9 @@ Once your feature is complete, you can make a pull request to merge your changes
 4. Add a description.
 5. Click **Create Pull Request**.
 
+## Dependencies
+JavaScript libraries are installed via NPM.
+- Supabase
+- Live Server
+- gh-pages
+
