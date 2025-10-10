@@ -1,0 +1,23 @@
+{
+  "name": "cs-3365-project",
+  "version": "1.0.0",
+  "description": "Install [git](https://git-scm.com/) if you haven't already.\r ```sh\r winget install -e --id Git.Git\r ```",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtman876/cs-3365-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jtman876/cs-3365-project/issues"
+  },
+  "homepage": "https://github.com/jtman876/cs-3365-project#readme",
+  "dependencies": {
+    "live-server": "^1.2.0"
+  }
+}
