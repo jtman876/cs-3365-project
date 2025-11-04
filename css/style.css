@@ -1,0 +1,44 @@
+body {
+
+}
+
+main {
+
+}
+section {
+  /* Content box adds border to width, whereas border box contains it */
+  box-sizing: border-box;
+}
+nav {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+nav a {
+  font-family: Arial;
+  font-size: 1.5rem;
+}
+
+.links {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.links a {
+  display: block;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  font-family: Arial;
+  font-size: 1.5rem;
+  text-align: center;
+  width: 100%;
+  /*background: blue;*/
+  border: 1px solid black;
+  /* Pulls the link below up one to overlap borders */
+  margin-bottom: -1px;
+
+}
