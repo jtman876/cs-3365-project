@@ -1,16 +1,12 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser } from './auth.js'
-
-const supabaseUrl = 'https://krjjfaendpntpjocgdbl.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyampmYWVuZHBudHBqb2NnZGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDMwNDAsImV4cCI6MjA3NTQ3OTA0MH0.5YtJH_grLZRzapwH7aJEJ2yHUgCGEry28iMGuu_X1ls'
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Get user details from auth.js
 let user = await getUser();
 let isAuthenticated = !(user === null);
 let isAdmin = (isAuthenticated) ? user.admin : false;
 
-// Build the Navigation Bar
+// TODO: move to components/navbar.js and fix navbar elements shifting/flashing on load
+// Build the Navigation background
 let nav = document.querySelectorAll('nav')[0];
 if (isAuthenticated) {
   let profile = document.createElement('a');
