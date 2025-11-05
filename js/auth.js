@@ -19,10 +19,23 @@ export async function login(email, password) {
 }
 
 /**
- *
+ * Register a user with Supabase.
+ * @returns {boolean} If the registration was successful
  */
 export async function register(name, email, address, phone, password) {
-
+  const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          name: name,
+          address: address,
+          phone: phone,
+        }
+      }
+    }
+  )
+  return !(error === null);
 }
 
 /**

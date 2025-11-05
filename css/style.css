@@ -40,5 +40,18 @@ nav a {
   border: 1px solid black;
   /* Pulls the link below up one to overlap borders */
   margin-bottom: -1px;
+}
+
+input {
+  border: 1px solid red;
+  display: inline-block;
+}
+
+label {
+}
+
+label::before{
+  content: " ";
+  display: block;
 
 }

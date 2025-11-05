@@ -1,18 +1,18 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-//import { isAuthenticated } from './js/auth.js'
+import { getUser } from './auth.js'
 
 const supabaseUrl = 'https://krjjfaendpntpjocgdbl.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyampmYWVuZHBudHBqb2NnZGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDMwNDAsImV4cCI6MjA3NTQ3OTA0MH0.5YtJH_grLZRzapwH7aJEJ2yHUgCGEry28iMGuu_X1ls'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// TODO: move to auth.js
-function isAuthenticated() {
-  return false;
-}
+// Get user details from auth.js
+let user = await getUser();
+let isAuthenticated = !(user === null);
+let isAdmin = (isAuthenticated) ? user.admin : false;
 
 // Build the Navigation Bar
 let nav = document.querySelectorAll('nav')[0];
-if (isAuthenticated()) {
+if (isAuthenticated) {
   let profile = document.createElement('a');
   profile.text = 'Profile';
   profile.href = './profile.html'
