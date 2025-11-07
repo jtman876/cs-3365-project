@@ -18,7 +18,6 @@ let supabaseClient;
  * Takes email and password and attempts to authenticate them with Supabase
  */
 export async function login(email, password) {
-
 }
 
 /**

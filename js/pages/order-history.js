@@ -1,2 +1,2 @@
-import { getOrderHistory } from './auth.js'
+import { getOrderHistory } from '../auth.js'
 

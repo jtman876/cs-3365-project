@@ -1,2 +1,2 @@
-import { getCurrentMovies } from './auth.js'
+import { getCurrentMovies } from '../auth.js'
 

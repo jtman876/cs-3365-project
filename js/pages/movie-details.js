@@ -1,2 +1,2 @@
-import { orderTicket, submitReview } from './auth.js'
+import { orderTicket, submitReview } from '../auth.js'
 

@@ -5,9 +5,9 @@ main {
 
 }
 section {
-  /* Content box adds border to width, whereas border box contains it */
   box-sizing: border-box;
 }
+
 nav {
   display: flex;
   width: 100%;
@@ -43,7 +43,6 @@ nav a:first-child {
   font-size: 1.5rem;
   text-align: center;
   width: 100%;
-  /*background: blue;*/
   border: 1px solid black;
   /* Pulls the link below up one to overlap borders */
   margin-bottom: -1px;

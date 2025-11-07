@@ -1,2 +1,2 @@
-import {addMovie, updateMovie, removeMovie, getStatus} from './auth.js'
+import {addMovie, updateMovie, removeMovie, getStatus} from '../auth.js'
 
