@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register | Mercury Movie Booker</title>
+    <link href="css/style.css" rel="stylesheet">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+    <script type="module" src="./js/pages/register.js"></script>
+  </head>
+  <body>
+    <nav>
+     <a href="./index.html">Mercury Movie Booker</a> 
+    </nav>
+    <!-- TODO: can use novalidate for the form to implement custom validation-->
+    <form>
+      <label for="name">Name: </label>
+      <input type="text" name="name" required>
+
+      <label for="email">Email Address: </label>
+      <input type="text" name="email" value="">
+
+      <label for="address">Home Address: </label>
+      <input type="text" name="address" value="">
+
+      <label for="phone">Phone Number: </label>
+      <input type="text" name="phone" value="">
+
+      <label for="password">Password: </label>
+      <input type="text" name="password" value="">
+
+      <input type="submit" value="Register">
+    </form>
+    <a href="./index.html">Register</a>
+  </body>
+</html>
