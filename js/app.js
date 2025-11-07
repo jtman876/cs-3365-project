@@ -25,6 +25,15 @@ if (isAuthenticated) {
   nav.appendChild(register);
 }
 
+for (const child of nav.children) {
+  child.addEventListener("mouseover", (event) => {
+    event.target.style.color = "white";
+  })
+  child.addEventListener("mouseout", (event) => {
+    event.target.style.color = "rgba(233, 8, 2, 1)";
+  })
+}
+
 // Hover over links
 let links = document.querySelectorAll('section')[0].children;
 for (const link of links) {
