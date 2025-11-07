@@ -1,5 +1,4 @@
 body {
-
 }
 
 main {
@@ -13,11 +12,19 @@ nav {
   display: flex;
   width: 100%;
   justify-content: space-around;
+  gap: 2rem;
 }
 
 nav a {
   font-family: Arial;
   font-size: 1.5rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+}
+
+nav a:first-child {
+  margin-right: auto;
 }
 
 .links {

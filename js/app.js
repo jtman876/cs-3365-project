@@ -25,6 +25,19 @@ if (isAuthenticated) {
   nav.appendChild(register);
 }
 
+// TODO: make the body or container hidden until javascript is finished
+ /*
+const styleSheet = document.styleSheets[0];
+// Set nav text to red, then  make the document visible
+for (let i = 0; i < styleSheet.cssRules.length; i++) {
+  const rule = styleSheet.cssRules[i];
+  if (rule.selectorText === 'body') {
+    rule.style.visibility = 'visible';
+    break;
+  }
+}
+*/
+
 // Hover over links
 let links = document.querySelectorAll('section')[0].children;
 for (const link of links) {
@@ -37,3 +50,4 @@ for (const link of links) {
     // event.target.style.fontSize = "1.5rem";
   })
 }
+
