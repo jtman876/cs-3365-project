@@ -11,13 +11,28 @@ const Theaters = Object.freeze({
 
 let supabaseClient;
 
+/*const supabase = getSupabase()
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log("auth changed:", event, session);
+});
+const { data: { session }} = await supabase.auth.getSession();
+const user = await getUser();
+console.log('session: ' + JSON.stringify(user, null, 2))
 
-
+*/
 
 /**
  * Takes email and password and attempts to authenticate them with Supabase
  */
 export async function login(email, password) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  })
+  console.log(data)
+  console.log(error)
+  setupAuthlistener();
 }
 
 /**
@@ -25,7 +40,7 @@ export async function login(email, password) {
  * @returns {boolean} If the registration was successful
  */
 export async function register(name, email, address, phone, password) {
-  supabase = getSupabase();
+  const supabase = getSupabase();
   const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -38,6 +53,7 @@ export async function register(name, email, address, phone, password) {
       }
     }
   )
+  console.log(error)
   return !(error === null);
 }
 
@@ -45,7 +61,32 @@ export async function register(name, email, address, phone, password) {
  * Returns a User object with personal information, or null if there is no user logged in
  */
 export async function getUser() {
-  return null;
+  const supabase = getSupabase();
+  const { data: { session }} = await supabase.auth.getSession();
+  if (!session) {
+    return null;
+  }
+
+  setupAuthlistener();
+
+  console.log('User found')
+  return {
+    id: session.user.id,
+    email: session.user.email,
+    name: session.user.user_metadata.name,
+    address: session.user.user_metadata.address,
+    phone: session.user.user_metadata.phone
+  }
+}
+
+/**
+ * Signs out the user
+ */
+export async function logoutUser() {
+  const supabase = getSupabase()
+  const { error } = await supabase.auth.signOut()
+  console.log(error)
+  return error
 }
 
 export async function updateProfile() {
@@ -121,3 +162,22 @@ function getSupabase() {
 function createMovie(id, title, synopsis, reviews, cast,) {
 
 }
+
+let authSubscription;
+
+function setupAuthlistener() {
+  if (authSubscription) {
+    authSubscription.data.subscription.unsubscribe();
+  }
+
+  // Reload the page when the user signs in or out
+  const supabase = getSupabase();
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log(event)
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      window.location.reload();
+    }
+  });
+}
+
+
