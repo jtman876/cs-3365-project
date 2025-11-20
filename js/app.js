@@ -27,10 +27,15 @@ if (isAuthenticated) {
   })
   nav.appendChild(logout);
 } else {
-  let login = document.createElement('a');
-  login.text = 'Log in';
-  login.href = './login.html'
-  nav.appendChild(login);
+  let loginButton = document.createElement('a');
+  loginButton.text = 'Log in';
+  loginButton.href = './login.html'
+  // TODO: remove later - temporarily login by hovering over
+  loginButton.addEventListener("mouseover", async (event) => {
+    await login("jtman876@gmail.com", "johndoe");
+    window.location.reload();
+  })
+  nav.appendChild(loginButton);
 
   let register = document.createElement('a');
   register.text = 'Register';
@@ -57,8 +62,8 @@ for (const link of links) {
   link.addEventListener("mouseover", (event) => {
     event.target.style.background = "lightblue";
     // event.target.style.fontSize = "1.8rem";
-    //register("John Doe", "jtman876@gmail.com", "1234 56th St.", "12345689", "johndoe")
-    login("jtman876@gmail.com", "johndoe");
+    // register("John Doe", "jtman876@gmail.com", "1234 56th St.", "+11234567788", "johndoe")
+    // login("jtman876@gmail.com", "johndoe");
     
   })
   link.addEventListener("mouseout", (event) => {

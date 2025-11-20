@@ -1,25 +1,54 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const Theaters = Object.freeze({
+/**
+ * @file Helper functions for accessing Supabase.
+ * Typically, you should first check if the user is logged in with getUser
+ * Then, you can add or remove objects from the database with these functions
+ */
+
+export const Theaters = Object.freeze({
   LUBBOCK: 'Lubbock',
   AMARILLO: 'Amarillo',
   LEVELLAND: 'Levelland',
   PLAINVIEW: 'Plainview',
   SNYDER: 'Snyder',
   ABILENE: 'Abilene'
-}) 
+});
+
+export const Roles = Object.freeze({
+  CUSTOMER: 'Customer',
+  ADMIN: 'Admin'
+});
 
 let supabaseClient;
+let authSubscription;
 
-/*const supabase = getSupabase()
-supabase.auth.onAuthStateChange((event, session) => {
-  console.log("auth changed:", event, session);
-});
-const { data: { session }} = await supabase.auth.getSession();
-const user = await getUser();
-console.log('session: ' + JSON.stringify(user, null, 2))
+// movie1 is an example of how to structure a movie for the database
+let movie1 = {
+  id: 1,
+  isCurrent: true,
+  title: "Lord of the Rings",
+  synopsis: "Synposis goes here",
+  cast: [
+    ["Actor 1", "Character 1"],
+    ["Actor 2", "Character 2"],
+  ],
+  ticketPrice: 2.44,
+  runtime: "1 hour 28 minutes 56 seconds",
+  showtimes: [
+    new Date(),
+  ]
+}
 
-*/
+// TODO: Remove later - testing movie retrieval from Supabase
+// let supabase = getSupabase();
+// login("jtman876@gmail.com", "johndoe");
+let user = await getUser();
+if (user) {
+  let movies = await getCurrentMovies();
+  console.log(user);
+  console.log(movies);
+}
 
 /**
  * Takes email and password and attempts to authenticate them with Supabase
@@ -33,6 +62,7 @@ export async function login(email, password) {
   console.log(data)
   console.log(error)
   setupAuthlistener();
+  return null;
 }
 
 /**
@@ -46,9 +76,10 @@ export async function register(name, email, address, phone, password) {
       password: password,
       options: {
         data: {
-          name: name,
-          address: address,
+          display_name: name,
           phone: phone,
+          address: address,
+          role: Roles.CUSTOMER,
         }
       }
     }
@@ -69,13 +100,13 @@ export async function getUser() {
 
   setupAuthlistener();
 
-  console.log('User found')
   return {
     id: session.user.id,
     email: session.user.email,
-    name: session.user.user_metadata.name,
+    name: session.user.user_metadata.display_name,
     address: session.user.user_metadata.address,
-    phone: session.user.user_metadata.phone
+    phone: session.user.user_metadata.phone,
+    role: session.user.user_metadata.role
   }
 }
 
@@ -93,8 +124,6 @@ export async function updateProfile() {
   return null;
 }
 
-/**/
-
 /**
  * Takes a User object and attempts to retrieve order history
  * Returns a list of tickets
@@ -103,8 +132,22 @@ export async function getOrderHistory(user) {
   return null;
 }
 
+/**
+ * Gets the current movies from the database and returns a list of movie objects
+ */
 export async function getCurrentMovies() {
-  return null;
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('movies')
+    .select('*')  
+    .eq('is_current', true)
+
+  if (error) {
+    console.error('Error fetching current movies:', error)
+    return null;
+  }
+
+  return data
 }
 
 export async function getUpcomingMovies() {
@@ -115,9 +158,9 @@ export async function searchMovies(title) {
   return null;
 }
 
-// Choose information for the ticket. Returns unique barcode upon successful delivery
-// No need to send payment information to the database - it is automatically accepted
 /**
+ * Choose information for the ticket. Returns unique barcode upon successful delivery
+ * No need to send payment information to the database - it is automatically accepted
  * @Returns {number} barcode - the unique barcode for the ticket ordered
  */
 export async function orderTicket(movie, time, theater, numSeats) {
@@ -132,7 +175,23 @@ export async function submitReview(review) {
  * Allows admins to add movies to the database
  */
 export async function addMovie(movie) {
-  return null;
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('movies')
+    .insert({
+      is_current: movie.isCurrent,
+      title: movie.title,
+      synopsis: movie.synopsis,
+      cast: movie.cast,
+      runtime: movie.runtime,
+      showtimes: movie.showtimes,
+      ticket_price: movie.ticketPrice,
+    });
+
+  if (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 export async function updateMovie(movie) {
@@ -147,6 +206,8 @@ export async function getStatus() {
   return null;
 }
 
+/* ------------------ Private functions ------------------ */
+
 /**
   * Singleton pattern for retrieving Supabase Client connection
   */
@@ -159,12 +220,9 @@ function getSupabase() {
   return supabaseClient;
 }
 
-function createMovie(id, title, synopsis, reviews, cast,) {
-
-}
-
-let authSubscription;
-
+/**
+  * Reload on sign in or sign out
+  */
 function setupAuthlistener() {
   if (authSubscription) {
     authSubscription.data.subscription.unsubscribe();
@@ -180,4 +238,4 @@ function setupAuthlistener() {
   });
 }
 
-
+ // TODO: policy ((auth.jwt() ->> 'role'::text) = ANY (ARRAY['Customer'::text, 'Admin'::text]))
