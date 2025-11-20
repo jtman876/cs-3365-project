@@ -1,4 +1,4 @@
-import { getUser } from './auth.js'
+import { getUser, login, register, logoutUser } from './auth.js'
 
 // Get user details from auth.js
 let user = await getUser();
@@ -13,11 +13,29 @@ if (isAuthenticated) {
   profile.text = 'Profile';
   profile.href = './profile.html'
   nav.appendChild(profile);
+
+  let logout = document.createElement('a');
+  logout.text = 'Log out';
+  logout.href = ''
+  logout.addEventListener("click", (event) => {
+    event.preventDefault();
+    try {
+      let error = logoutUser();
+    } catch (err) {
+      console.error("Error in logging out", err);
+    }
+  })
+  nav.appendChild(logout);
 } else {
-  let login = document.createElement('a');
-  login.text = 'Log in';
-  login.href = './login.html'
-  nav.appendChild(login);
+  let loginButton = document.createElement('a');
+  loginButton.text = 'Log in';
+  loginButton.href = './login.html'
+  // TODO: remove later - temporarily login by hovering over
+  loginButton.addEventListener("mouseover", async (event) => {
+    await login("jtman876@gmail.com", "johndoe");
+    window.location.reload();
+  })
+  nav.appendChild(loginButton);
 
   let register = document.createElement('a');
   register.text = 'Register';
@@ -44,6 +62,9 @@ for (const link of links) {
   link.addEventListener("mouseover", (event) => {
     event.target.style.background = "lightblue";
     // event.target.style.fontSize = "1.8rem";
+    // register("John Doe", "jtman876@gmail.com", "1234 56th St.", "+11234567788", "johndoe")
+    // login("jtman876@gmail.com", "johndoe");
+    
   })
   link.addEventListener("mouseout", (event) => {
     event.target.style.background = "white";
