@@ -6,7 +6,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
  * Then, you can add or remove objects from the database with these functions
  */
 
-export const Theaters = Object.freeze({
+/**
+ * @enum {string} All movie theater locations
+ */
+export const Theater = Object.freeze({
   LUBBOCK: 'Lubbock',
   AMARILLO: 'Amarillo',
   LEVELLAND: 'Levelland',
@@ -15,7 +18,10 @@ export const Theaters = Object.freeze({
   ABILENE: 'Abilene'
 });
 
-export const Roles = Object.freeze({
+/**
+ * @enum {string} Permission level of the user
+ */
+export const Role = Object.freeze({
   CUSTOMER: 'Customer',
   ADMIN: 'Admin'
 });
@@ -41,13 +47,17 @@ let movie1 = {
 }
 
 // TODO: Remove later - testing movie retrieval from Supabase
-// let supabase = getSupabase();
-// login("jtman876@gmail.com", "johndoe");
 let user = await getUser();
 if (user) {
-  let movies = await getCurrentMovies();
-  console.log(user);
-  console.log(movies);
+  // let movies = await getCurrentMovies();
+  let movies = await searchMovies('Lord');
+  if (movies) {
+    let reviews = await getReviews(movies[0].id);
+    console.log(reviews);
+    // submitReview(movies[0].id, 4, 'This is the greatest movie I\'ve ever seen!');
+    // let tickets = await orderTickets(movies[0], movies[0].showtimes[0], Theater.AMARILLO, 1);
+    // console.log('Barcodes: ', tickets)
+  }
 }
 
 /**
@@ -134,41 +144,146 @@ export async function getOrderHistory(user) {
 
 /**
  * Gets the current movies from the database and returns a list of movie objects
+ * TODO: update the column names
  */
 export async function getCurrentMovies() {
   const supabase = getSupabase();
-  const { data, error } = await supabase
+  const { data: currentMovies, error } = await supabase
     .from('movies')
     .select('*')  
-    .eq('is_current', true)
+    .eq('is_current', true);
 
   if (error) {
-    console.error('Error fetching current movies:', error)
+    console.error('Error fetching current movies: ', error)
     return null;
   }
 
-  return data
-}
-
-export async function getUpcomingMovies() {
-  return null;
-}
-
-export async function searchMovies(title) {
-  return null;
+  return currentMovies;
 }
 
 /**
- * Choose information for the ticket. Returns unique barcode upon successful delivery
- * No need to send payment information to the database - it is automatically accepted
- * @Returns {number} barcode - the unique barcode for the ticket ordered
+ * Gets the upcoming movies from the database and returns a list of movie objects
+ * TODO: update the column names
  */
-export async function orderTicket(movie, time, theater, numSeats) {
-  return null;
+export async function getUpcomingMovies() {
+  const supabase = getSupabase();
+  const { data: upcomingMovies, error } = await supabase
+    .from('movies')
+    .select('*')
+    .eq('is_current', false);
+
+  if (error) {
+    console.error('Error fetching upcoming movies: ', error)
+    return null;
+  }
+
+  return upcomingMovies;
 }
 
-export async function submitReview(review) {
-  return null;
+/**
+ * Search all movies by title and returns a list of movie objects
+ */
+export async function searchMovies(title) {
+  const supabase = getSupabase();
+  const { data: movies, error } = await supabase
+    .from('movies')
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)
+    .textSearch('title', `'Lord'`);
+
+  if (error) {
+    console.error('Error searching movies: ', error)
+    return null;
+  }
+
+  console.log(movies)
+  return movies;
+}
+
+/**
+ * Receives ticket information and generates barcodes.
+ * No need to send payment information to the database - it is automatically accepted
+ * @param numSeats - The number of seats to book, which determines how many tickets are generated
+ * @returns {number[]|null} The unique barcodes for the tickets ordered, or null if no tickets were successfully generated
+ */
+export async function orderTickets(movie, showtime, theater, numSeats) {
+  const supabase = getSupabase();
+  const user = await getUser();
+  let barcodes = [];
+  console.log('Ordering ticket: ', movie.id, user.id, movie.ticketPrice, theater, showtime);
+
+  for (let i = 0; i < numSeats; i++) {
+    const { data: barcode, error } = await supabase
+      .from('tickets')
+      .insert({
+        movie_id: movie.id,
+        user_id: user.id,
+        price: movie.ticketPrice,
+        theater: theater,
+        showtime: showtime,
+      }).select('id');
+    barcodes.push(barcode[0].id);
+    if (error) {
+      console.log(error);
+      return barcodes.length != 0 ? barcodes : null;
+    }
+  }
+  return barcodes;
+}
+
+/**
+ * Get all the reviews written for a movie
+ * TODO: create a separate profiles table or add names to the reviews table
+ */
+export async function getReviews(movieId) {
+  const supabase = getSupabase();
+  const user = await getUser();
+
+  const { data: reviews, error } = await supabase
+    .from('reviews')
+    .select()
+    .eq('movie_id', movieId);
+
+  if (error) {
+    console.log(error);
+    return null;
+  }
+
+  return reviews;
+}
+
+/**
+ * Write a user review for a movie
+ * @param {number} movieId - The id of the movie being reviewed
+ * @param {number} rating - The rating 1 to 5 stars given by the user
+ * @param {string} content - The content of the review
+ * @returns {boolean} Whether the review was successfully uploaded
+ */
+export async function submitReview(movieId, rating, content) {
+  const supabase = getSupabase();
+  const user = await getUser();
+
+  const { data, error } = await supabase
+    .from('reviews')
+    .insert({
+      movie_id: movieId,
+      user_id: user.id,
+      rating: rating,
+      content: content
+    });
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
 /**
