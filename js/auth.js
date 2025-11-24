@@ -6,6 +6,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
  * Then, you can add or remove objects from the database with these functions
  */
 
+// TODO: refactor table names into enum
+
 /**
  * @enum {string} All movie theater locations
  */
@@ -25,6 +27,15 @@ export const Role = Object.freeze({
   CUSTOMER: 'Customer',
   ADMIN: 'Admin'
 });
+
+/**
+ * @enum {string} Status for movie tickets
+ */
+export const TicketStatus = Object.freeze({
+  VALID: "valid",
+  USED: "used",
+  EXPIRED: "expired"
+})
 
 let supabaseClient;
 let authSubscription;
@@ -130,16 +141,52 @@ export async function logoutUser() {
   return error
 }
 
-export async function updateProfile() {
-  return null;
+/**
+ * Update the user's information
+ */
+export async function updateProfile(name, email, address, phone) {
+  const supabase = getSupabase();
+  const user = getUser();
+  if (!user) {
+    console.log("Unable to update profile: user not found");
+    return false;
+  }
+  const { data, error } = await supabase.auth.updateUser({
+    email: email,
+    data: {
+      display_name: name,
+      address: address,
+      phone: phone,
+      role: user.role
+    }
+  })
+  
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
 /**
  * Takes a User object and attempts to retrieve order history
  * Returns a list of tickets
+ * TODO: Specify return and retrieve movie titles to go with tickets
  */
 export async function getOrderHistory(user) {
-  return null;
+  const supabase = getSupabase();
+  const user = getUser();
+
+  const { data: tickets, error } = await supabase
+    .from('tickets')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.log(error);
+    return null;
+  }
+  return tickets;
 }
 
 /**
@@ -229,6 +276,7 @@ export async function orderTickets(movie, showtime, theater, numSeats) {
         price: movie.ticketPrice,
         theater: theater,
         showtime: showtime,
+        status: TicketStatus.VALID
       }).select('id');
     barcodes.push(barcode[0].id);
     if (error) {
@@ -309,16 +357,74 @@ export async function addMovie(movie) {
   }
 }
 
+/**
+ * Takes a new movie and replaced the old one with the same id
+ * @returns {boolean} If the movie was sucessfully updated
+ */
 export async function updateMovie(movie) {
-  return null;
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('movies')
+    .update({
+      is_current: movie.isCurrent,
+      title: movie.title,
+      synopsis: movie.synopsis,
+      cast: movie.cast,
+      runtime: movie.runtime,
+      showtimes: movie.showtimes,
+      ticket_price: movie.ticketPrice,
+    })
+    .eq('id', movie.id)
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
-export async function removeMovie(movie) {
-  return null;
+/**
+ * Delete a movie by id
+ * @returns {boolean} If the movie was sucessfully deleted
+ */
+export async function removeMovie(movieId) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('movies')
+    .delete()
+    .eq('id', movieId);
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
+// TODO: get the top selling movies
 export async function getStatus() {
-  return null;
+  let status; 
+  const supabase = getSupabase();
+  const { count, data, error } = await supabase
+    .from('tickets')
+    .select('price.sum()', { count: "exact"});
+
+  if (error) {
+    console.log(error);
+    return null;
+  }
+
+  /* Get all movies and sort them alphabetically. 
+  const { data, error } = await supabase
+    .from('movies')
+    .select('*')
+    .order('title', { ascending: true });
+   */
+
+  status.count = count;
+  status.revenue = data[0]
+
+  return status
 }
 
 /* ------------------ Private functions ------------------ */
