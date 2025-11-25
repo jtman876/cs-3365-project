@@ -1,16 +1,13 @@
+/**
+ * @fileoverview Helper functions for accessing Supabase.
+ * Typically, you should first check if the user is logged in with getUser.
+ * Then, you can add or remove objects from the database with these functions.
+ * TODO: refactor table names into enum
+ */
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-/**
- * @file Helper functions for accessing Supabase.
- * Typically, you should first check if the user is logged in with getUser
- * Then, you can add or remove objects from the database with these functions
- */
-
-// TODO: refactor table names into enum
-
-/**
- * @enum {string} All movie theater locations
- */
+/** @enum {string} All movie theater locations. */
 export const Theater = Object.freeze({
   LUBBOCK: 'Lubbock',
   AMARILLO: 'Amarillo',
@@ -20,17 +17,13 @@ export const Theater = Object.freeze({
   ABILENE: 'Abilene'
 });
 
-/**
- * @enum {string} Permission level of the user
- */
+/** @enum {string} Permission level of the user. */
 export const Role = Object.freeze({
   CUSTOMER: 'Customer',
   ADMIN: 'Admin'
 });
 
-/**
- * @enum {string} Status for movie tickets
- */
+/** @enum {string} Status for movie tickets. */
 export const TicketStatus = Object.freeze({
   VALID: "valid",
   USED: "used",
@@ -58,13 +51,18 @@ let movie1 = {
 }
 
 // TODO: Remove later - testing movie retrieval from Supabase
-let user = await getUser();
-if (user) {
+let user1 = await getUser();
+if (user1) {
   // let movies = await getCurrentMovies();
   let movies = await searchMovies('Lord');
   if (movies) {
-    let reviews = await getReviews(movies[0].id);
-    console.log(reviews);
+    movies[0].showtimes.push(new Date());
+    console.log(movies[0]);
+    // let reviews = await getReviews(movies[0].id);
+    // console.log(reviews);
+
+    // updateProfile("John Doe", "jtman876@gmail.com", "1234 56th St.", "+12223334444")
+
     // submitReview(movies[0].id, 4, 'This is the greatest movie I\'ve ever seen!');
     // let tickets = await orderTickets(movies[0], movies[0].showtimes[0], Theater.AMARILLO, 1);
     // console.log('Barcodes: ', tickets)
@@ -72,45 +70,8 @@ if (user) {
 }
 
 /**
- * Takes email and password and attempts to authenticate them with Supabase
- */
-export async function login(email, password) {
-  const supabase = getSupabase();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  })
-  console.log(data)
-  console.log(error)
-  setupAuthlistener();
-  return null;
-}
-
-/**
- * Register a user with Supabase.
- * @returns {boolean} If the registration was successful
- */
-export async function register(name, email, address, phone, password) {
-  const supabase = getSupabase();
-  const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          display_name: name,
-          phone: phone,
-          address: address,
-          role: Roles.CUSTOMER,
-        }
-      }
-    }
-  )
-  console.log(error)
-  return !(error === null);
-}
-
-/**
  * Returns a User object with personal information, or null if there is no user logged in
+ * TODO: change to auth.getUser
  */
 export async function getUser() {
   const supabase = getSupabase();
@@ -132,17 +93,70 @@ export async function getUser() {
 }
 
 /**
+ * Takes email and password and attempts to authenticate them with Supabase.
+ * @returns {boolean} Whether the user was sucessfully signed in. 
+ */
+export async function login(email, password) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  })
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+
+  setupAuthlistener();
+  return true;
+}
+
+/**
+ * Register a user with Supabase.
+ * @returns {boolean} If the registration was successful.
+ */
+export async function register(name, email, address, phone, password) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          display_name: name,
+          phone: phone,
+          address: address,
+          role: Roles.CUSTOMER,
+        }
+      }
+    }
+  )
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Signs out the user
+ * @returns {boolean} Whether the user was signed out.
  */
 export async function logoutUser() {
   const supabase = getSupabase()
   const { error } = await supabase.auth.signOut()
-  console.log(error)
-  return error
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true; 
 }
 
 /**
  * Update the user's information
+ * @returns {boolean} Whether the update was successful.
  */
 export async function updateProfile(name, email, address, phone) {
   const supabase = getSupabase();
@@ -169,11 +183,11 @@ export async function updateProfile(name, email, address, phone) {
 }
 
 /**
- * Takes a User object and attempts to retrieve order history
- * Returns a list of tickets
+ *
+ * Retrieves all movie tickets that the user has ordered
  * TODO: Specify return and retrieve movie titles to go with tickets
  */
-export async function getOrderHistory(user) {
+export async function getOrderHistory() {
   const supabase = getSupabase();
   const user = getUser();
 
@@ -251,7 +265,9 @@ export async function searchMovies(title) {
     return null;
   }
 
-  console.log(movies)
+  // Convert every showtime to Date format
+  movies.forEach(m => m.showtimes.forEach((v, i, a) => a[i] = new Date(v)));
+
   return movies;
 }
 
