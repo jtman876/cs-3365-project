@@ -2,7 +2,7 @@
  * @fileoverview Helper functions for accessing Supabase.
  * Typically, you should first check if the user is logged in with getUser.
  * Then, you can add or remove objects from the database with these functions.
- * TODO: refactor table names into enum
+ * TODO: refactor database table names into an enum
  */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -44,7 +44,7 @@ let movie1 = {
     ["Actor 2", "Character 2"],
   ],
   ticketPrice: 2.44,
-  runtime: "1 hour 28 minutes 56 seconds",
+  runtime: "1 hr 28 min",
   showtimes: [
     new Date(),
   ]
@@ -57,7 +57,7 @@ if (user1) {
   let movies = await searchMovies('Lord');
   if (movies) {
     movies[0].showtimes.push(new Date());
-    console.log(movies[0]);
+
     // let reviews = await getReviews(movies[0].id);
     // console.log(reviews);
 
@@ -205,13 +205,21 @@ export async function getOrderHistory() {
 
 /**
  * Gets the current movies from the database and returns a list of movie objects
- * TODO: update the column names
  */
 export async function getCurrentMovies() {
   const supabase = getSupabase();
   const { data: currentMovies, error } = await supabase
     .from('movies')
-    .select('*')  
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)  
     .eq('is_current', true);
 
   if (error) {
@@ -219,18 +227,26 @@ export async function getCurrentMovies() {
     return null;
   }
 
-  return currentMovies;
+  return parseMovies(currentMovies);
 }
 
 /**
  * Gets the upcoming movies from the database and returns a list of movie objects
- * TODO: update the column names
  */
 export async function getUpcomingMovies() {
   const supabase = getSupabase();
   const { data: upcomingMovies, error } = await supabase
     .from('movies')
-    .select('*')
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)
     .eq('is_current', false);
 
   if (error) {
@@ -238,7 +254,7 @@ export async function getUpcomingMovies() {
     return null;
   }
 
-  return upcomingMovies;
+  return parseMovies(upcomingMovies);
 }
 
 /**
@@ -265,10 +281,7 @@ export async function searchMovies(title) {
     return null;
   }
 
-  // Convert every showtime to Date format
-  movies.forEach(m => m.showtimes.forEach((v, i, a) => a[i] = new Date(v)));
-
-  return movies;
+  return parseMovies(movies);
 }
 
 /**
@@ -437,8 +450,8 @@ export async function getStatus() {
     .order('title', { ascending: true });
    */
 
-  status.count = count;
-  status.revenue = data[0]
+  status.ticket_count = count;
+  status.revenue = data[0];
 
   return status
 }
@@ -469,10 +482,34 @@ function setupAuthlistener() {
   const supabase = getSupabase();
   supabase.auth.onAuthStateChange((event, session) => {
     console.log(event)
-    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+    if (/*event === "SIGNED_IN" || */event === "SIGNED_OUT") {
       window.location.reload();
     }
   });
+}
+
+/**
+  * Convert movies from database form to object form
+  */
+function parseMovies(movies) {
+// Convert every showtime to Date format and extract hours and minutes from runtime
+  movies.forEach(m => {
+    m.showtimes.forEach((v, i, a) => a[i] = new Date(v));
+    let l = m.runtime.length;
+    // Indexing assumes time recorded in no less than seconds, format 00:00:00
+    let hours = m.runtime.substring(l-8, l-6);
+    let minutes = m.runtime.substring(l-5, l-3);
+
+    if (hours[0] === "0") {
+      hours = hours[1];
+    }
+
+    if (minutes[0] === "0") {
+      minutes = minutes[1];
+    }
+    m.runtime = hours + " hr " + minutes + " min";
+  });
+  return movies;
 }
 
  // TODO: policy ((auth.jwt() ->> 'role'::text) = ANY (ARRAY['Customer'::text, 'Admin'::text]))
