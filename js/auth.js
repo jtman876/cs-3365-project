@@ -1,14 +1,13 @@
+/**
+ * @fileoverview Helper functions for accessing Supabase.
+ * Typically, you should first check if the user is logged in with getUser.
+ * Then, you can add or remove objects from the database with these functions.
+ * TODO: refactor database table names into an enum
+ */
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-/**
- * @file Helper functions for accessing Supabase.
- * Typically, you should first check if the user is logged in with getUser
- * Then, you can add or remove objects from the database with these functions
- */
-
-/**
- * @enum {string} All movie theater locations
- */
+/** @enum {string} All movie theater locations. */
 export const Theater = Object.freeze({
   LUBBOCK: 'Lubbock',
   AMARILLO: 'Amarillo',
@@ -18,20 +17,25 @@ export const Theater = Object.freeze({
   ABILENE: 'Abilene'
 });
 
-/**
- * @enum {string} Permission level of the user
- */
+/** @enum {string} Permission level of the user. */
 export const Role = Object.freeze({
   CUSTOMER: 'Customer',
   ADMIN: 'Admin'
 });
+
+/** @enum {string} Status for movie tickets. */
+export const TicketStatus = Object.freeze({
+  VALID: "valid",
+  USED: "used",
+  EXPIRED: "expired"
+})
 
 let supabaseClient;
 let authSubscription;
 
 // movie1 is an example of how to structure a movie for the database
 let movie1 = {
-  id: 1,
+  id: 1, // Don't need to set an id.
   isCurrent: true,
   title: "Lord of the Rings",
   synopsis: "Synposis goes here",
@@ -40,66 +44,30 @@ let movie1 = {
     ["Actor 2", "Character 2"],
   ],
   ticketPrice: 2.44,
-  runtime: "1 hour 28 minutes 56 seconds",
+  runtime: "1 hr 28 min",
   showtimes: [
     new Date(),
   ]
 }
 
 // TODO: Remove later - testing movie retrieval from Supabase
-let user = await getUser();
-if (user) {
+let user1 = await getUser();
+if (user1) {
   // let movies = await getCurrentMovies();
-  let movies = await searchMovies('Lord');
-  if (movies) {
-    let reviews = await getReviews(movies[0].id);
-    console.log(reviews);
+  // let movies = await searchMovies('Lord');
+  // if (movies) {
+    // let ticket = await orderTickets(d[0], d[0].showtimes[0], Theater.LUBBOCK, 1);
+    // let tickets = await getOrderHistory();
+    // console.log(await getReviews(movies[0].id))
+    // updateProfile("John Doe", "jtman876@gmail.com", "1234 56th St.", "+12223334444")
     // submitReview(movies[0].id, 4, 'This is the greatest movie I\'ve ever seen!');
-    // let tickets = await orderTickets(movies[0], movies[0].showtimes[0], Theater.AMARILLO, 1);
-    // console.log('Barcodes: ', tickets)
-  }
+  // }
 }
 
 /**
- * Takes email and password and attempts to authenticate them with Supabase
- */
-export async function login(email, password) {
-  const supabase = getSupabase();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  })
-  console.log(data)
-  console.log(error)
-  setupAuthlistener();
-  return null;
-}
-
-/**
- * Register a user with Supabase.
- * @returns {boolean} If the registration was successful
- */
-export async function register(name, email, address, phone, password) {
-  const supabase = getSupabase();
-  const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          display_name: name,
-          phone: phone,
-          address: address,
-          role: Roles.CUSTOMER,
-        }
-      }
-    }
-  )
-  console.log(error)
-  return !(error === null);
-}
-
-/**
- * Returns a User object with personal information, or null if there is no user logged in
+ * Check if a user is logged in
+ * @returns {User|null} Returns the authenticated user with their information, or null if there is no user logged in
+ * TODO: change to auth.getUser
  */
 export async function getUser() {
   const supabase = getSupabase();
@@ -121,36 +89,150 @@ export async function getUser() {
 }
 
 /**
+ * Takes email and password and attempts to authenticate them with Supabase.
+ * @returns {boolean} Whether the user was sucessfully signed in. 
+ */
+export async function login(email, password) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  })
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+
+  setupAuthlistener();
+  return true;
+}
+
+/**
+ * Register a user with Supabase.
+ * @returns {boolean} If the registration was successful.
+ */
+export async function register(name, email, address, phone, password) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          display_name: name,
+          phone: phone,
+          address: address,
+          role: Roles.CUSTOMER,
+        }
+      }
+    }
+  )
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Signs out the user
+ * @returns {boolean} Whether the user was signed out.
  */
 export async function logoutUser() {
   const supabase = getSupabase()
   const { error } = await supabase.auth.signOut()
-  console.log(error)
-  return error
-}
-
-export async function updateProfile() {
-  return null;
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true; 
 }
 
 /**
- * Takes a User object and attempts to retrieve order history
- * Returns a list of tickets
+ * Update the user's information
+ * @returns {boolean} Whether the update was successful.
  */
-export async function getOrderHistory(user) {
-  return null;
+export async function updateProfile(name, email, address, phone) {
+  const supabase = getSupabase();
+  const user = await getUser();
+  if (!user) {
+    console.log("Unable to update profile: user not found");
+    return false;
+  }
+  const { data, error } = await supabase.auth.updateUser({
+    email: email,
+    data: {
+      display_name: name,
+      address: address,
+      phone: phone,
+      role: user.role
+    }
+  })
+  
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
 /**
- * Gets the current movies from the database and returns a list of movie objects
- * TODO: update the column names
+ * Retrieves all movie tickets that the user has ordered
+ * @returns {Object[]|null} List of movie tickets, or null if there was an error
+ */
+export async function getOrderHistory() {
+  const supabase = getSupabase();
+  const user = await getUser();
+
+  const { data, error } = await supabase
+    .from('tickets')
+    .select(`
+      id,
+      price,
+      theater,
+      showtime,
+      status,
+      movies!inner(title)
+    `)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.log(error);
+    return null;
+  }
+
+  const tickets = data.map(ticket => ({
+    id: ticket.id,
+    price: ticket.price,
+    theater: ticket.theater,
+    showtime: ticket.showtime,
+    status: ticket.status,
+    movieTitle: ticket.movies.title
+  }));
+
+  return tickets;
+}
+
+/**
+ * Gets the current movies from the database 
+ * @returns {Object[]|null} List of current movies, or null if there was an error
  */
 export async function getCurrentMovies() {
   const supabase = getSupabase();
   const { data: currentMovies, error } = await supabase
     .from('movies')
-    .select('*')  
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)  
     .eq('is_current', true);
 
   if (error) {
@@ -158,18 +240,27 @@ export async function getCurrentMovies() {
     return null;
   }
 
-  return currentMovies;
+  return parseMovies(currentMovies);
 }
 
 /**
- * Gets the upcoming movies from the database and returns a list of movie objects
- * TODO: update the column names
+ * Gets the upcoming movies from the database
+ * @returns {Object[]|null} List of upcoming movies, or null if there was an error
  */
 export async function getUpcomingMovies() {
   const supabase = getSupabase();
   const { data: upcomingMovies, error } = await supabase
     .from('movies')
-    .select('*')
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)
     .eq('is_current', false);
 
   if (error) {
@@ -177,11 +268,12 @@ export async function getUpcomingMovies() {
     return null;
   }
 
-  return upcomingMovies;
+  return parseMovies(upcomingMovies);
 }
 
 /**
- * Search all movies by title and returns a list of movie objects
+ * Search all movies by title 
+ * @returns {Object[]|null} List of movies matching the title, or null if there was an error
  */
 export async function searchMovies(title) {
   const supabase = getSupabase();
@@ -204,8 +296,7 @@ export async function searchMovies(title) {
     return null;
   }
 
-  console.log(movies)
-  return movies;
+  return parseMovies(movies);
 }
 
 /**
@@ -213,12 +304,12 @@ export async function searchMovies(title) {
  * No need to send payment information to the database - it is automatically accepted
  * @param numSeats - The number of seats to book, which determines how many tickets are generated
  * @returns {number[]|null} The unique barcodes for the tickets ordered, or null if no tickets were successfully generated
+ * TODO: consider changing to take movieId
  */
 export async function orderTickets(movie, showtime, theater, numSeats) {
   const supabase = getSupabase();
   const user = await getUser();
   let barcodes = [];
-  console.log('Ordering ticket: ', movie.id, user.id, movie.ticketPrice, theater, showtime);
 
   for (let i = 0; i < numSeats; i++) {
     const { data: barcode, error } = await supabase
@@ -229,6 +320,7 @@ export async function orderTickets(movie, showtime, theater, numSeats) {
         price: movie.ticketPrice,
         theater: theater,
         showtime: showtime,
+        status: TicketStatus.VALID
       }).select('id');
     barcodes.push(barcode[0].id);
     if (error) {
@@ -241,7 +333,7 @@ export async function orderTickets(movie, showtime, theater, numSeats) {
 
 /**
  * Get all the reviews written for a movie
- * TODO: create a separate profiles table or add names to the reviews table
+ * @returns {Object[]|null} List of reviews, or null if there was an error
  */
 export async function getReviews(movieId) {
   const supabase = getSupabase();
@@ -249,7 +341,12 @@ export async function getReviews(movieId) {
 
   const { data: reviews, error } = await supabase
     .from('reviews')
-    .select()
+    .select(`
+      id,
+      name:display_name,
+      rating,
+      content
+    `)
     .eq('movie_id', movieId);
 
   if (error) {
@@ -276,6 +373,7 @@ export async function submitReview(movieId, rating, content) {
     .insert({
       movie_id: movieId,
       user_id: user.id,
+      display_name: user.name,
       rating: rating,
       content: content
     });
@@ -288,6 +386,7 @@ export async function submitReview(movieId, rating, content) {
 
 /**
  * Allows admins to add movies to the database
+ * @returns {boolean} Whether the movie was successfully added
  */
 export async function addMovie(movie) {
   const supabase = getSupabase();
@@ -305,20 +404,115 @@ export async function addMovie(movie) {
 
   if (error) {
     console.log(error);
-    return null;
+    return false;
   }
+  return true;
 }
 
+/**
+ * Takes a new movie and replaced the old one with the same id
+ * @returns {boolean} If the movie was sucessfully updated
+ */
 export async function updateMovie(movie) {
-  return null;
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('movies')
+    .update({
+      is_current: movie.isCurrent,
+      title: movie.title,
+      synopsis: movie.synopsis,
+      cast: movie.cast,
+      runtime: movie.runtime,
+      showtimes: movie.showtimes,
+      ticket_price: movie.ticketPrice,
+    })
+    .eq('id', movie.id)
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
-export async function removeMovie(movie) {
-  return null;
+/**
+ * Delete a movie by id
+ * @returns {boolean} If the movie was sucessfully deleted
+ */
+export async function removeMovie(movieId) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('movies')
+    .delete()
+    .eq('id', movieId);
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return true;
 }
 
+/**
+ * A report of the current status of the system
+ * @typedef {Object} status
+ * @property {Object} movieTicketSales - An array of objects, each representing all the tickets sold for a particular movie, 
+ * sorted in descending order by the amount of revenue each movie generated. Each object has a title, revenue, and count.
+ * @property {number} ticketCount - The total number of tickets sold
+ * @property {number} totalRevenue - The total amount of revenue generated by all tickets sales
+ * @property {number} totalMovieCount - The number of all movies, current and upcoming, currently available on the system
+ * @property {number} currentMovieCount - The number of all movies currently playing in theaters
+ */
+
+/**
+ * Get an admin status report of the system
+ * @returns {status} returns the status of the system
+ */
 export async function getStatus() {
-  return null;
+  let status = {}; 
+  const supabase = getSupabase();
+  const { count: ticketCount, data: ticketsByMovie, error: ticketError } = await supabase
+    .from('tickets')
+    .select(`
+      price.sum(),
+      movie_id,
+      movie_id.count(),
+      movies!inner(title)
+      `, { count: "exact"});
+
+  if (ticketError) {
+    console.log(error);
+  } else {
+    status.ticketCount = ticketCount;
+
+    let movieTicketSales = [];
+    let totalRevenue = 0;
+    for (const tickets of ticketsByMovie) {
+      let movieTickets = {}
+      movieTickets['title'] = tickets.movies.title;
+      movieTickets['revenue'] = tickets.sum;
+      movieTickets['count'] = tickets.count;
+      movieTicketSales.push(movieTickets);
+      totalRevenue += tickets.sum;
+    }
+    movieTicketSales.sort((a, b) => b.revenue - a.revenue);
+    status.movieTicketSales = movieTicketSales;
+    status.totalRevenue = totalRevenue;
+  }
+
+  const { count: movieCount, data: movies, error: movieError } = await supabase
+    .from('movies')
+    .select('count()', { count: "exact"} )
+    .eq('is_current', true);
+
+  if (movieError) {
+    console.log(movieError);
+  } else {
+    status.currentMovieCount = movieCount;
+    status.totalMovieCount = movies[0].count;
+  }
+
+  return status
 }
 
 /* ------------------ Private functions ------------------ */
@@ -346,11 +540,34 @@ function setupAuthlistener() {
   // Reload the page when the user signs in or out
   const supabase = getSupabase();
   supabase.auth.onAuthStateChange((event, session) => {
-    console.log(event)
-    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+    if (/*event === "SIGNED_IN" || */event === "SIGNED_OUT") {
       window.location.reload();
     }
   });
+}
+
+/**
+  * Convert movies from database form to object form
+  */
+function parseMovies(movies) {
+// Convert every showtime to Date format and extract hours and minutes from runtime
+  movies.forEach(m => {
+    m.showtimes.forEach((v, i, a) => a[i] = new Date(v));
+    let l = m.runtime.length;
+    // Indexing assumes time recorded in no less than seconds, format 00:00:00
+    let hours = m.runtime.substring(l-8, l-6);
+    let minutes = m.runtime.substring(l-5, l-3);
+
+    if (hours[0] === "0") {
+      hours = hours[1];
+    }
+
+    if (minutes[0] === "0") {
+      minutes = minutes[1];
+    }
+    m.runtime = hours + " hr " + minutes + " min";
+  });
+  return movies;
 }
 
  // TODO: policy ((auth.jwt() ->> 'role'::text) = ANY (ARRAY['Customer'::text, 'Admin'::text]))

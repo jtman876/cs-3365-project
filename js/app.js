@@ -3,7 +3,6 @@ import { getUser, login, register, logoutUser } from './auth.js'
 // Get user details from auth.js
 let user = await getUser();
 let isAuthenticated = !(user === null);
-let isAdmin = (isAuthenticated) ? user.admin : false;
 
 // TODO: move to components/navbar.js and fix navbar elements shifting/flashing on load
 // Build the Navigation background
