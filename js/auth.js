@@ -56,7 +56,11 @@ if (user1) {
   // let movies = await getCurrentMovies();
   let movies = await searchMovies('Lord');
   if (movies) {
-    movies[0].showtimes.push(new Date());
+    // let ticket = await orderTickets(movies[0], movies[0].showtimes[0], Theater.AMARILLO, 1);
+    let tickets = await getOrderHistory();
+    console.log(tickets);
+    // movies[0].showtimes.push(new Date());
+    // console.log(await getReviews(movies[0].id))
 
     // let reviews = await getReviews(movies[0].id);
     // console.log(reviews);
@@ -64,13 +68,13 @@ if (user1) {
     // updateProfile("John Doe", "jtman876@gmail.com", "1234 56th St.", "+12223334444")
 
     // submitReview(movies[0].id, 4, 'This is the greatest movie I\'ve ever seen!');
-    // let tickets = await orderTickets(movies[0], movies[0].showtimes[0], Theater.AMARILLO, 1);
     // console.log('Barcodes: ', tickets)
   }
 }
 
 /**
- * Returns a User object with personal information, or null if there is no user logged in
+ * Check if a user is logged in
+ * @returns {User|null} Returns the authenticated user with their information, or null if there is no user logged in
  * TODO: change to auth.getUser
  */
 export async function getUser() {
@@ -160,7 +164,7 @@ export async function logoutUser() {
  */
 export async function updateProfile(name, email, address, phone) {
   const supabase = getSupabase();
-  const user = getUser();
+  const user = await getUser();
   if (!user) {
     console.log("Unable to update profile: user not found");
     return false;
@@ -183,28 +187,45 @@ export async function updateProfile(name, email, address, phone) {
 }
 
 /**
- *
  * Retrieves all movie tickets that the user has ordered
- * TODO: Specify return and retrieve movie titles to go with tickets
+ * @returns {Object[]|null} List of movie tickets, or null if there was an error
  */
 export async function getOrderHistory() {
   const supabase = getSupabase();
-  const user = getUser();
+  const user = await getUser();
 
-  const { data: tickets, error } = await supabase
+  const { data, error } = await supabase
     .from('tickets')
-    .select('*')
+    .select(`
+      id,
+      price,
+      theater,
+      showtime,
+      status,
+      movies!inner(title)
+    `)
     .eq('user_id', user.id);
 
   if (error) {
     console.log(error);
     return null;
   }
+
+  const tickets = data.map(ticket => ({
+    id: ticket.id,
+    price: ticket.price,
+    theater: ticket.theater,
+    showtime: ticket.showtime,
+    status: ticket.status,
+    movieTitle: ticket.movies.title
+  }));
+
   return tickets;
 }
 
 /**
- * Gets the current movies from the database and returns a list of movie objects
+ * Gets the current movies from the database 
+ * @returns {Object[]|null} List of current movies, or null if there was an error
  */
 export async function getCurrentMovies() {
   const supabase = getSupabase();
@@ -231,7 +252,8 @@ export async function getCurrentMovies() {
 }
 
 /**
- * Gets the upcoming movies from the database and returns a list of movie objects
+ * Gets the upcoming movies from the database
+ * @returns {Object[]|null} List of upcoming movies, or null if there was an error
  */
 export async function getUpcomingMovies() {
   const supabase = getSupabase();
@@ -258,7 +280,8 @@ export async function getUpcomingMovies() {
 }
 
 /**
- * Search all movies by title and returns a list of movie objects
+ * Search all movies by title 
+ * @returns {Object[]|null} List of movies matching the title, or null if there was an error
  */
 export async function searchMovies(title) {
   const supabase = getSupabase();
@@ -318,7 +341,7 @@ export async function orderTickets(movie, showtime, theater, numSeats) {
 
 /**
  * Get all the reviews written for a movie
- * TODO: create a separate profiles table or add names to the reviews table
+ * @returns {Object[]|null} List of reviews, or null if there was an error
  */
 export async function getReviews(movieId) {
   const supabase = getSupabase();
@@ -326,7 +349,12 @@ export async function getReviews(movieId) {
 
   const { data: reviews, error } = await supabase
     .from('reviews')
-    .select()
+    .select(`
+      id,
+      name:display_name,
+      rating,
+      content
+    `)
     .eq('movie_id', movieId);
 
   if (error) {
@@ -353,6 +381,7 @@ export async function submitReview(movieId, rating, content) {
     .insert({
       movie_id: movieId,
       user_id: user.id,
+      display_name: user.name,
       rating: rating,
       content: content
     });
@@ -365,6 +394,7 @@ export async function submitReview(movieId, rating, content) {
 
 /**
  * Allows admins to add movies to the database
+ * @returns {boolean} Whether the movie was successfully added
  */
 export async function addMovie(movie) {
   const supabase = getSupabase();
@@ -382,8 +412,9 @@ export async function addMovie(movie) {
 
   if (error) {
     console.log(error);
-    return null;
+    return false;
   }
+  return true;
 }
 
 /**
