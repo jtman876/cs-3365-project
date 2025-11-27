@@ -3,9 +3,6 @@
 ## Installation
 
 Install [git](https://git-scm.com/) if you haven't already.
-```sh
-winget install -e --id Git.Git
-```
 
 Install [npm](https://www.npmjs.com/) if you haven't already.
 ```sh
@@ -25,7 +22,7 @@ npm install
 
 ## Making Changes
 
-To start making changes, get the latest changes and start making your own additions.
+Get the latest changes before you start making your own additions.
 ```sh
 # Get latest changes
 git checkout master
@@ -42,11 +39,12 @@ When you're finished, save your changes.
 ```sh
 git add .
 git commit -m "<description of your changes>"
-git push origin feature/<your-feature>
+git push -u origin feature/<your-feature>
 ```
 
 > Note: If you get latest changes with `git pull origin master` while on your feature branch, you will need to resolve any conflicts between your code and the new code.
 
+## Submit Changes
 Once your feature is complete, you can make a pull request to merge your changes with the master branch.
 1. Go to the **Pull Requests** tab on GitHub.
 2. Click on **New Pull Request**. 

@@ -1,4 +1,4 @@
-import { register } from './auth.js'
+import { register } from '../auth.js'
 
 const form = document.querySelector('form');
 form.addEventListener('submit', function(event) {

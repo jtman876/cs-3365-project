@@ -1,2 +1,2 @@
-import { getUpcomingMovies } from './auth.js'
+import { getUpcomingMovies } from '../auth.js'
 

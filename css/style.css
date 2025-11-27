@@ -9,7 +9,6 @@ main {
 }
 
 section {
-  /* Content box adds border to width, whereas border box contains it */
   box-sizing: border-box;
 }
 
@@ -24,6 +23,7 @@ nav {
   box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(3px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 2rem;
 }
 
 nav a {
@@ -43,6 +43,13 @@ nav a:hover {
   background: rgba(0,0,0,.1);
   border: 1px solid rgba(233, 8, 2, 1);
   padding: 3px 9px;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+}
+
+nav a:first-child {
+  margin-right: auto;
 }
 
 .links {
