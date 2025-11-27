@@ -12,19 +12,18 @@ section {
   /* Content box adds border to width, whereas border box contains it */
   box-sizing: border-box;
 }
+
 nav {
   display: flex;
   width: 100%;
   justify-content: space-around;
   position: absolute;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.3);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: rgba(25, 25, 25, 0.5);
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(3px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  /*border: 4px solid rgba(255, 255, 255, 0.3);*/
-  /*border: 1px  #000;*/
 }
 
 nav a {
@@ -32,6 +31,18 @@ nav a {
   font-size: 1.5rem;
   color: rgba(233, 8, 2, 1);
   text-decoration: none;
+  display: block;
+  background: rgba(0,0,0,.4);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+nav a:hover {
+  color: white;
+  background: rgba(0,0,0,.1);
+  border: 1px solid rgba(233, 8, 2, 1);
+  padding: 3px 9px;
 }
 
 .links {
@@ -44,16 +55,36 @@ nav a {
 
 .links a {
   display: block;
-  padding-top: 50px;
-  padding-bottom: 50px;
+  padding-top: 100px;
+  padding-bottom: 100px;
   font-family: Arial;
-  font-size: 1.5rem;
+  font-size: 2.5rem;
+  text-decoration: none;
+  color: #FFF;
   text-align: center;
   width: 100%;
-  /*background: blue;*/
-  border: 1px solid black;
-  /* Pulls the link below up one to overlap borders */
-  margin-bottom: -1px;
+  overflow: hidden;
+  position: relative;
+}
+
+.links a:hover {
+  box-shadow: inset 0 0 0 5px white; 
+}
+
+.links img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  background-size: cover;
+  transition: transform 0.3s ease;
+}
+
+.links a:hover img {
+  transform: scale(1.10) translate(-45%, -45%);
 }
 
 input {
@@ -71,73 +102,6 @@ label::before{
 
 img {
   width: 100%;
-  /*clip-path: inset(0% 0% 10% 0%);*/
   z-index: -1;
   margin-bottom: -4px; /* Strange spacing between image and main content */
-}
-
-
-:nth-child(1 of .shape) {
-  clip-path: shape(from 0 100%,
-    curve to 100% 0 with 100% 100%,
-    line to 100% 100%)
-/*transform: scaleX(-1);*/
-}
-
-:nth-child(2 of .shape) {
-  clip-path: shape(from 0 0,
-    curve to 100% 100% with 0 100%,
-    line to 0 100%);
-  margin-left: -1px;
-}
-
-  /* A shape inside of a shape increases the lenght of the curve by same factor*/
-:nth-child(3 of .shape) {
-  clip-path: shape(from 0 0,
-    curve to 100% 100% with 100% 0,
-    line to 100% 0);
-  margin-top: -1px;
-}
-
-:nth-child(4 of .shape) {
-  clip-path: shape(from 0 100%,
-    curve to 100% 0 with 0 0,
-    line to 0 0);
-/*transform: scaleX(-1);*/
-    margin: -1px;
-}
-
-.star {
-  /*display: inline-block;*/
-  position: relative;
-  /* Temporary size. Place the grid in an inline-block for all cells to squish together */
-  height: 100%;
-  /*width: 30px;*/
-  /*height: 30px;*/
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 0;
-  /*display: flex;*/
-  /*flex-wrap: wrap;*/
-  /*transform: scale(.5);*/
-}
-
-.shape {
-  position: relative; /* Can use position absolute to squish four shapes into a single box */
-  width: auto;
-  aspect-ratio: 1;
-  display: inline-block;
-  background: red;
-  margin: 0px;
-  /*margin: 100px 0 0 0;*/
-  /* Starts drawing at the starting point */
-  /*clip-path: shape(from 50% 0,*/
-  /*  curve to 100% 100% with 50% 0, line to 0 100%)*/
-  /*clip-path: shape(from 0 0,*/
-  /*  curve to 100% 100% with 0 100%, line to 0 100%)*/
-}
-
-.container {
-  display: inline-block;
 }
