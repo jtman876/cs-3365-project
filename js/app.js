@@ -55,19 +55,3 @@ for (let i = 0; i < styleSheet.cssRules.length; i++) {
 }
 */
 
-// Hover over links
-let links = document.querySelectorAll('section')[0].children;
-for (const link of links) {
-  link.addEventListener("mouseover", (event) => {
-    event.target.style.background = "lightblue";
-    // event.target.style.fontSize = "1.8rem";
-    // register("John Doe", "jtman876@gmail.com", "1234 56th St.", "+11234567788", "johndoe")
-    // login("jtman876@gmail.com", "johndoe");
-    
-  })
-  link.addEventListener("mouseout", (event) => {
-    event.target.style.background = "white";
-    // event.target.style.fontSize = "1.5rem";
-  })
-}
-
