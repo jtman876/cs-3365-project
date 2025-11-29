@@ -10,13 +10,17 @@ main {
 
 section {
   box-sizing: border-box;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 nav {
   display: flex;
   width: 100%;
   justify-content: space-around;
-  position: absolute;
+  position: relative;
   padding-top: 5px;
   padding-bottom: 5px;
   background: rgba(25, 25, 25, 0.5);
@@ -39,7 +43,7 @@ nav a {
 }
 
 nav a:hover {
-  color: white;
+  color: white;H
   background: rgba(0,0,0,.1);
   border: 1px solid rgba(233, 8, 2, 1);
   padding: 3px 9px;
@@ -53,6 +57,19 @@ nav a:first-child {
 
 nav a:last-child {
   margin-right: 50px;
+}
+
+img {
+  width: 100%;
+  z-index: -1;
+}
+
+img.background {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin-top: -49px; /* Height of nav */
 }
 
 .links {
@@ -97,9 +114,31 @@ nav a:last-child {
   transform: scale(1.10) translate(-45%, -45%);
 }
 
+form {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+}
+
+label {
+  font-size: 1.2rem;
+}
+
 input {
   border: 1px solid red;
   display: inline-block;
+  max-width: 200px;
+  margin-bottom: 50px;
+  padding: 0;
+}
+
+.modifiable input:focus {
+  outline: none;
+
+}
+
+input:focus {
+  outline: none;
 }
 
 label {
@@ -110,8 +149,25 @@ label::before{
   display: block;
 }
 
-img {
-  width: 100%;
-  z-index: -1;
-  margin-bottom: -4px; /* Strange spacing between image and main content */
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+p {
+  font-size: 1rem;
+}
+
+button {
+}
+.hidden {
+  display: none;
 }

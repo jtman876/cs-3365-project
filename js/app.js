@@ -8,9 +8,16 @@ let isAuthenticated = !(user === null);
 // Build the Navigation background
 let nav = document.querySelectorAll('nav')[0];
 if (isAuthenticated) {
+  if (user.admin || true) {
+    let admin = document.createElement('a');
+    admin.text = 'Admin';
+    admin.href = './admin.html';
+    nav.appendChild(admin);
+  }
+
   let profile = document.createElement('a');
   profile.text = 'Profile';
-  profile.href = './profile.html'
+  profile.href = './profile.html';
   nav.appendChild(profile);
 
   let logout = document.createElement('a');
@@ -23,7 +30,7 @@ if (isAuthenticated) {
     } catch (err) {
       console.error("Error in logging out", err);
     }
-  })
+  });
   nav.appendChild(logout);
 } else {
   let loginButton = document.createElement('a');
