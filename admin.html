@@ -1,4 +1,80 @@
 <!DOCTYPE html>
+<style type="text/css">
+	.text {
+		font-size: 2.5rem;
+	}
+	.manageShow {
+		display: flex;
+		flex-flow: row wrap;
+		align-items: center;
+		width: 98%;
+		height: auto;
+		border: 2px solid #000000;
+		margin: 4px;
+	}
+	
+	.manageShowComponent {
+		margin: 4px;
+		padding: 4px;
+		text-align: center;
+		height: 45pt;
+		resize: none;
+		font-family: monospace;
+		border: 1px thin #000000;
+	}
+	
+	.editButton {
+		width: 3%;
+		min-width: 35px;
+	}
+	.removeButton {
+		width: 3%;
+		font-size: 8pt;
+		min-width: 35px;
+	}
+	.showTitle {
+		width: 15%;
+		font-size: 14pt;
+		min-width: 150pt;
+	}
+	.showSynopsis {
+		width: 30%;
+		font-size: 12pt;
+		min-width: 150pt;
+	}
+	.showCast {
+		width: 25%;
+		font-size: 12pt;
+		min-width: 150pt;
+	}
+	.showCurrent {
+		display: grid;
+		font-size: 8pt;
+		min-width: 100pt;
+		width: 8%;
+	}
+	.showRadio {
+		display: flex;
+		align-items: center;
+	}
+	.showRuntime {
+		font-size: 10pt;
+		min-width: 60pt;
+		width: 4%;
+	}
+	.showTimes {
+		font-size: 9pt;
+		min-width: 80pt;
+		width: 5%;
+	}
+	.showPrice {
+		font-size: 10pt;
+		min-width: 35pt;
+		width: 3%;
+	}
+</style>
+
+
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -11,7 +87,12 @@
   </head>
   <body>
     <nav>
-     <a href="./index.html">Mercury Movie Booker</a> 
+    <a href="./index.html">Mercury Movie Booker</a> 
     </nav>
+	<main class="text">
+	<br>
+	<u>Manage Shows</u>
+	<div id="showList"></div>
+	</main>
   </body>
 </html>

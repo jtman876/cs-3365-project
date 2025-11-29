@@ -512,7 +512,26 @@ export async function getStatus() {
     status.totalMovieCount = movies[0].count;
   }
 
-  return status
+  const { data: allMovies, movieListError } = await supabase
+	.from('movies')
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `);
+
+  if (movieListError) {
+    console.error('Error fetching movies: ', movieListError);
+  } else {
+	status.movieList = parseMovies(allMovies);
+  }
+  
+  return status;
 }
 
 /* ------------------ Private functions ------------------ */
@@ -553,7 +572,8 @@ function parseMovies(movies) {
 // Convert every showtime to Date format and extract hours and minutes from runtime
   movies.forEach(m => {
     m.showtimes.forEach((v, i, a) => a[i] = new Date(v));
-    let l = m.runtime.length;
+	
+	let l = m.runtime.length;
     // Indexing assumes time recorded in no less than seconds, format 00:00:00
     let hours = m.runtime.substring(l-8, l-6);
     let minutes = m.runtime.substring(l-5, l-3);
