@@ -22,7 +22,7 @@ profileButton.addEventListener('click', function() {
     input.disabled = false;
   }
   submitForm.style.display = "block";
-})
+});
 
 submitForm.addEventListener('click', async (event) => {
   event.preventDefault();
