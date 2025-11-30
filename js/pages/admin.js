@@ -1,7 +1,9 @@
-import {Theater, addMovie, updateMovie, removeMovie, getStatus} from '../auth.js'
+import {addMovie, updateMovie, removeMovie, getStatus} from '../auth.js'
 
 const status = await getStatus();
 console.log(status);
+
+
 
 const documentShowList = document.querySelector("#showList");
 
@@ -11,6 +13,7 @@ for (const movie of status["movieList"]) addMovieForm(movie, documentShowList);
 function addMovieForm(movie, htmlElement) {
 	const movieContent = document.createElement("form");
 	movieContent.classList.add("manageShow");
+	if (movie == null) movieContent.classList.add("newShowBox");
 	movieContent.setAttribute("method", "get");
 	movieContent.setAttribute("disabled", "disabled");
 	if (movie != null && movie.hasOwnProperty("id")) movieContent.setAttribute("name", `id-${movie["id"]}`);
@@ -20,70 +23,61 @@ function addMovieForm(movie, htmlElement) {
 		
 		if (e.target.getAttribute("name") == "new-movie") {
 			// Add a new movie in
-			const form = new FormData(movieContent);
+			const form = getFormData(e.target, true, "movie-isCurrent", "movie-title", "movie-synopsis", "movie-castInfo", "movie-price", "movie-runtime", "movie-showtimes");
 			let movieForm = {
-				isCurrent: form.get("movie-isCurrent") == "true",
-				title: form.get("movie-title"),
-				synopsis: form.get("movie-synopsis"),
-				cast: parseCastInformation(form.get("movie-castInfo")),
-				ticketPrice: parseTicketPrice(form.get("movie-price")),
-				runtime: form.get("movie-runtime"),
-				showtimes: parseShowtimes(form.get("movie-showtimes"))
+				isCurrent: form["movie-isCurrent"] == "true",
+				title: form["movie-title"],
+				synopsis: form["movie-synopsis"],
+				cast: parseCastInformation(form["movie-castInfo"]),
+				ticketPrice: parseTicketPrice(form["movie-price"]),
+				runtime: form["movie-runtime"],
+				showtimes: parseShowtimes(form["movie-showtimes"])
 			}
-			console.log(movieForm);
 			addMovie(movieForm);
-			addMovieForm(movieForm, htmlElement);
+			//addMovieForm(movieForm, htmlElement); // NEEDS TO KNOW THE ID OF THE NEW MOVIE BEFORE IT CAN WORK PROPERLY
 		}
 		else {
 			if (e.target.getAttribute("disabled") != null) {
 				// Allow existing movie to be edited
-				e.target.removeAttribute("disabled");
-				for (const child of e.target.children) {
-					if (child.getAttribute("type") == "submit") child.setAttribute("value", "Save");
-					else if (child.getAttribute("name") == "remove-movie") child.removeAttribute("hidden", "hidden");
-					else if (child.getAttribute("name") == "movie-current") {
-						for (const grandchild of child.children) if (grandchild.getAttribute("class") == "showRadio") for (const greatgrandchild of grandchild.children) if (greatgrandchild.getAttribute("name") == "movie-isCurrent") {
-							greatgrandchild.removeAttribute("hidden", "hidden");
-						}
-					}
-					else child.removeAttribute("disabled", "disabled");
-				}
+				applyFunctionToAllChildren(e.target, function(node) {
+					if (node.getAttribute("type") == "submit") node.setAttribute("value", "Save");
+					else if (node.getAttribute("hide")) node.removeAttribute("hidden");
+					else node.removeAttribute("disabled");
+				});
 			}
 			else {
 				// Save the changes to the existing movie, and return it to a disabled state
 				// Remove the movie if the remove checkbox was selected
-				e.target.setAttribute("disabled", "disabled");
+				
 				let remove_movie = false;
-				for (const child of e.target.children) {
-					if (child.getAttribute("type") == "submit") child.setAttribute("value", "Edit");
-					else if (child.getAttribute("name") == "remove-movie") {
-						child.setAttribute("hidden", "hidden");
-						if (child.children[1].checked) remove_movie = true;
+				applyFunctionToAllChildren(e.target, function(node) {
+					if (node.getAttribute("type") == "submit") node.setAttribute("value", "Edit");
+					else if (node.getAttribute("hide")) node.setAttribute("hidden", "hidden");
+					else node.setAttribute("disabled", "disabled");
+					
+					if (node.getAttribute("type") == "checkbox" && node.checked) {
+						if (window.confirm("Are you sure that you want to remove this show? This action cannot be undone.")) remove_movie = true;
+						else node.checked = false;
 					}
-					else if (child.getAttribute("name") == "movie-current") {
-						for (const grandchild of child.children) if (grandchild.getAttribute("class") == "showRadio") for (const greatgrandchild of grandchild.children) if (greatgrandchild.getAttribute("name") == "movie-isCurrent") {
-							greatgrandchild.setAttribute("hidden", "hidden");
-						}
-					}
-					else child.setAttribute("disabled", "disabled");
-				}
-				console.log(remove_movie);
+				});
 				
 				if (remove_movie) {
+					// Remove the movie
 					console.log("Removing film!");
 					removeMovie(parseMovieId(e.target));
 					e.target.remove();
 				} else {
-					const form = new FormData(movieContent);
+					// Update the movie
+					const form = getFormData(e.target, false, "movie-isCurrent", "movie-title", "movie-synopsis", "movie-castInfo", "movie-price", "movie-runtime", "movie-showtimes");
 					let movieForm = {
 						id: parseMovieId(e.target),
-						isCurrent: form.get("movie-isCurrent") == "true",
-						title: form.get("movie-title"),
-						synopsis: form.get("movie-synopsis"),
-						cast: parseCastInformation(form.get("movie-castInfo")),
-						ticketPrice: parseTicketPrice(form.get("movie-price")),
-						runtime: form.get("movie-runtime"),
-						showtimes: parseShowtimes(form.get("movie-showtimes"))
+						isCurrent: form["movie-isCurrent"] == "true",
+						title: form["movie-title"],
+						synopsis: form["movie-synopsis"],
+						cast: parseCastInformation(form["movie-castInfo"]),
+						ticketPrice: parseTicketPrice(form["movie-price"]),
+						runtime: form["movie-runtime"],
+						showtimes: parseShowtimes(form["movie-showtimes"])
 					}
 					updateMovie(movieForm);
 				}	
@@ -110,6 +104,7 @@ function addMovieForm(movie, htmlElement) {
 		const specialBox = document.createElement("fieldset");
 		specialBox.setAttribute("class", "manageShowComponent removeButton");
 		specialBox.setAttribute("name", "remove-movie");
+		specialBox.setAttribute("hide", "hide");
 		specialBox.setAttribute("hidden", "hidden");
 		const legendForBox = document.createElement("legend");
 		legendForBox.innerHTML = "Remove";
@@ -247,6 +242,34 @@ function addMovieForm(movie, htmlElement) {
 		movieContent.appendChild(movieComponent);
 	}
 }
+function applyFunctionToAllChildren(node, func) {
+	func(node);
+	for (const child of node.children) applyFunctionToAllChildren(child, func);
+}
+
+function getFormData(node, clear, ...keys) {
+	const object = {};
+	applyFunctionToAllChildren(node, function(node) {
+		for (const key of keys) if (node.getAttribute("name") == key) {
+			if (node.nodeName == "INPUT") {
+				if (node.getAttribute("type") == "text") {
+					object[key] = node.value;
+					if (clear) node.value = "";
+				}
+				else if (node.getAttribute("type") == "radio" && node.checked) {
+					object[key] = node.value;
+					if (clear) node.checked = false;
+				}
+			}
+			else if (node.nodeName == "TEXTAREA") {
+				object[key] = node.value;
+				if (clear) node.value = "";
+			}
+		}
+	});
+	return object;
+}
+
 
 function printCastInformation(cast_information) {
 	let string = "";
@@ -291,6 +314,5 @@ function parseShowtimes(showtimes) {
 function parseTicketPrice(price) {
 	const regex = /\$?([\d,\.]+)/g;
 	let vari = regex.exec(price);
-	console.log(vari);
 	return parseFloat(vari[1]);
 }
