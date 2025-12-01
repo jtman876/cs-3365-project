@@ -289,7 +289,7 @@ export async function searchMovies(title) {
       showtimes,
       ticketPrice:ticket_price
       `)
-    .textSearch('title', `'Lord'`);
+    .textSearch('title', title, {type: 'websearch', config: 'english'});
 
   if (error) {
     console.error('Error searching movies: ', error)
