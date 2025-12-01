@@ -26,30 +26,42 @@ async function renderCurrentMovies() {
       return;
     }
 
-  movies.forEach(movie => {
+movies.forEach(movie => {
   const card = document.createElement('article');
   card.classList.add('movie-card');
 
-  // Take up to the first 2 showtimes so it doesn't get too long
-  const showtimes = (movie.showtimes || [])
-    .slice(0, 2)
-    .map(time => `<li>${time}</li>`)
-    .join('');
+  // Create a clickable title that links to the movie details page
+  const title = document.createElement('h3');
+  const movieLink = document.createElement('a');
+  movieLink.href = `./movie-details.html?id=${movie.id}`;
+  movieLink.textContent = movie.title;
+  movieLink.classList.add('movie-link');
+  title.appendChild(movieLink);
 
-  card.innerHTML = `
-    <h3>${movie.title}</h3>
-    <p><strong>Synopsis:</strong> ${movie.synopsis}</p>
-    <p><strong>Runtime:</strong> ${movie.runtime}</p>
-    <p><strong>Ticket Price:</strong> $${movie.ticketPrice}</p>
-    ${
-      showtimes
-        ? `<p><strong>Showtimes:</strong></p><ul>${showtimes}</ul>`
-        : ''
-    }
-  `;
+  // Synopsis
+  const synopsisP = document.createElement('p');
+  synopsisP.innerHTML = `<strong>Synopsis:</strong> ${movie.synopsis}`;
 
+  // Runtime
+  const runtimeP = document.createElement('p');
+  runtimeP.innerHTML = `<strong>Runtime:</strong> ${movie.runtime}`;
+
+  // Ticket price
+  const priceP = document.createElement('p');
+  priceP.innerHTML = `<strong>Ticket Price:</strong> $${movie.ticketPrice}`;
+
+  // Append to card
+  card.appendChild(title);
+  card.appendChild(synopsisP);
+  card.appendChild(runtimeP);
+  card.appendChild(priceP);
+
+  // Finally add card to the container
   container.appendChild(card);
 });
+
+
+
 
   } catch (err) {
     console.error('Error in renderCurrentMovies():', err);
