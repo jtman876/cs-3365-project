@@ -1,4 +1,9 @@
-import {addMovie, updateMovie, removeMovie, getStatus} from '../auth.js'
+import {addMovie, updateMovie, removeMovie, getStatus, getUser, Role} from '../auth.js'
+
+const user = await getUser();
+if (user == null) {
+	window.location.replace("./index.html");
+}
 
 const status = await getStatus();
 console.log(status);
