@@ -1,209 +1,112 @@
-import {  getSupabase, getUser, getReviews, submitReview, orderTicket, submitReview } from '../auth.js'
-(async function run() {
-    // helper: parse query params
-    function getQueryParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
+import { getSupabase, getUser, getReviews, submitReview, orderTickets } from '../auth.js';
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const movieId = urlParams.get('id');
+  const movieDetails = document.getElementById('movie-details');
+  const reviewsSection = document.getElementById('reviews-section');
+  const loggedInUser = document.getElementById('logged-in-user');
+  const reviewSubmitBtn = document.getElementById('review-submit-btn');
+  
+  // Get movie details
+  async function getMovieDetails() {
+    const supabase = getSupabase();
+  
+    const { data: movie, error } = await supabase
+      .from('movies')
+      .select('*')
+      .eq('id', movieId)
+      .single();
+  
+    if (error) {
+      console.error('Error fetching movie details:', error);
+      return null;
     }
   
-    const movieIdParam = getQueryParam('id');
+    return movie;
+  }
   
-    // If no id provided: try to load by title param? fallback to searching "Lord" sample
-    let movieId = movieIdParam ? Number(movieIdParam) : null;
+  async function loadMovieData() {
+    const user = await getUser();
   
-    // Locate DOM elements
-    const movieContainer = document.getElementById('movie-container');
-    const reviewsList = document.getElementById('reviews-list');
-    const showtimeSelect = document.getElementById('showtime-select');
-    const theaterSelect = document.getElementById('theater-select');
-    const numSeatsInput = document.getElementById('num-seats');
-    const orderBtn = document.getElementById('order-btn');
-    const orderResult = document.getElementById('order-result');
-    const reviewRating = document.getElementById('review-rating');
-    const reviewContent = document.getElementById('review-content');
-    const submitReviewBtn = document.getElementById('submit-review');
-  
-    // load movie; if no id, load first result from searchMovies('Lord') as example
-    let movie = null;
-    try {
-      if (movieId) {
-        // Attempt to fetch single movie by id via Supabase directly (no helper exists)
-        const supabase = getSupabase();
-        const { data, error } = await supabase
-          .from('movies')
-          .select('*')
-          .eq('id', movieId)
-          .single();
-  
-        if (error) {
-          console.error('Error loading movie by id:', error);
-        } else {
-          movie = data;
-        }
-      }
-  
-      if (!movie) {
-        // fallback: search by title "Lord" (use existing helper searchMovies if available)
-        if (typeof searchMovies === 'function') {
-          const results = await searchMovies('Lord');
-          if (results && results.length > 0) movie = results[0];
-        }
-      }
-    } catch (err) {
-      console.error(err);
+    if (user) {
+      loggedInUser.textContent = `Logged in as: ${user.email}`;
     }
   
+    const movie = await getMovieDetails();
     if (!movie) {
-      movieContainer.innerHTML = '<p>Movie not found.</p>';
+      movieDetails.innerHTML = "<p>Error loading movie details.</p>";
       return;
     }
   
-    // Render movie details
-    function formatShowtime(s) {
-      try {
-        const d = new Date(s);
-        return d.toLocaleString();
-      } catch {
-        return String(s);
-      }
-    }
+    movieDetails.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">${movie.title}</h2>
+      <p class="mb-4">${movie.synopsis}</p>
+      <p><strong>Showtime:</strong> ${movie.showtime}</p>
+      <p><strong>Price:</strong> $${movie.ticket_price}</p>
   
-    movieContainer.innerHTML = `
-      <h1>${movie.title}</h1>
-      <p><strong>Runtime:</strong> ${movie.runtime ?? 'n/a'}</p>
-      <p><strong>Synopsis:</strong> ${movie.synopsis ?? ''}</p>
-      <p><strong>Ticket price:</strong> $${(movie.ticketPrice ?? movie.ticket_price ?? 0).toFixed(2)}</p>
-      <h4>Cast</h4>
-      <ul id="cast-list"></ul>
+      <button id="order-ticket-btn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+        Order Ticket
+      </button>
     `;
   
-    const castList = document.getElementById('cast-list');
-    if (movie.cast && Array.isArray(movie.cast)) {
-      movie.cast.forEach(c => {
-        // c may be [actor, role] or string
-        if (Array.isArray(c)) {
-          const li = document.createElement('li');
-          li.textContent = `${c[0]} as ${c[1]}`;
-          castList.appendChild(li);
-        } else {
-          const li = document.createElement('li');
-          li.textContent = c;
-          castList.appendChild(li);
-        }
-      });
+    document.getElementById('order-ticket-btn').addEventListener('click', async () => {
+      if (!user) {
+        alert("You must be logged in to order a ticket.");
+        return;
+      }
+  
+      const result = await orderTickets(user.id, movieId, movie.ticket_price);
+      if (result) {
+        alert("Ticket ordered successfully!");
+      } else {
+        alert("Failed to order ticket.");
+      }
+    });
+  
+    loadReviews(movieId);
+  }
+  
+  async function loadReviews(movieId) {
+    const reviews = await getReviews(movieId);
+  
+    if (!reviews || reviews.length === 0) {
+      reviewsSection.innerHTML = "<p>No reviews yet.</p>";
+      return;
     }
   
-    // populate showtimes
-    const showtimes = movie.showtimes || [];
-    showtimeSelect.innerHTML = '';
-    if (showtimes.length === 0) {
-      const opt = document.createElement('option');
-      opt.text = 'No showtimes';
-      opt.value = '';
-      showtimeSelect.appendChild(opt);
+    reviewsSection.innerHTML = reviews.map(review => `
+      <div class="border p-3 rounded mb-2">
+        <p><strong>${review.user_email}</strong> — ${review.rating}/5</p>
+        <p>${review.review_text}</p>
+      </div>
+    `).join('');
+  }
+  
+  // Handle review submission
+  reviewSubmitBtn.addEventListener('click', async () => {
+    const user = await getUser();
+    if (!user) {
+      alert("You must be logged in to submit a review.");
+      return;
+    }
+  
+    const rating = document.getElementById('review-rating').value;
+    const text = document.getElementById('review-text').value;
+  
+    if (!rating || !text) {
+      alert("Please enter both a rating and a review.");
+      return;
+    }
+  
+    const success = await submitReview(user.id, movieId, rating, text);
+  
+    if (success) {
+      alert("Review submitted successfully!");
+      loadReviews(movieId);
     } else {
-      showtimes.forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st;
-        opt.text = formatShowtime(st);
-        showtimeSelect.appendChild(opt);
-      });
+      alert("Failed to submit review.");
     }
+  });
   
-    // Load reviews
-    async function loadReviews() {
-      reviewsList.innerHTML = '<p>Loading reviews...</p>';
-      try {
-        const reviews = await getReviews(movie.id);
-        if (!reviews || reviews.length === 0) {
-          reviewsList.innerHTML = '<p>No reviews yet.</p>';
-          return;
-        }
-        reviewsList.innerHTML = '';
-        reviews.forEach(r => {
-          const div = document.createElement('div');
-          div.className = 'review';
-          const rating = document.createElement('div');
-          rating.textContent = `Rating: ${r.rating}/5`;
-          const body = document.createElement('p');
-          body.textContent = r.content;
-          const meta = document.createElement('small');
-          meta.textContent = `by ${r.user_id ?? 'anonymous'} on ${new Date(r.created_at ?? r.createdAt ?? Date.now()).toLocaleString()}`;
-          div.appendChild(rating);
-          div.appendChild(body);
-          div.appendChild(meta);
-          reviewsList.appendChild(div);
-        });
-      } catch (err) {
-        console.error(err);
-        reviewsList.innerHTML = '<p>Error loading reviews.</p>';
-      }
-    }
+  loadMovieData();
   
-    await loadReviews();
-  
-    // Submit review
-    submitReviewBtn.addEventListener('click', async () => {
-      const rating = Number(reviewRating.value);
-      const content = reviewContent.value.trim();
-      if (!content) {
-        alert('Please write a review.');
-        return;
-      }
-      try {
-        const ok = await submitReview(movie.id, rating, content);
-        if (ok) {
-          reviewContent.value = '';
-          await loadReviews();
-          alert('Review submitted!');
-        } else {
-          alert('Failed to submit review.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error submitting review.');
-      }
-    });
-  
-    // Order tickets
-    orderBtn.addEventListener('click', async () => {
-      const numSeats = Number(numSeatsInput.value) || 1;
-      const showtime = showtimeSelect.value;
-      const theater = theaterSelect.value;
-  
-      if (!showtime) {
-        alert('Please select a showtime.');
-        return;
-      }
-  
-      orderBtn.disabled = true;
-      orderResult.textContent = 'Processing order...';
-  
-      try {
-        const barcodes = await orderTickets(
-          {
-            id: movie.id,
-            ticketPrice: movie.ticketPrice ?? movie.ticket_price ?? 0
-          },
-          showtime,
-          theater,
-          numSeats
-        );
-  
-        if (!barcodes) {
-          orderResult.textContent = 'Order failed.';
-          orderBtn.disabled = false;
-          return;
-        }
-  
-        orderResult.innerHTML = `<p>Order successful! Tickets: ${barcodes.join(', ')}</p>
-          <p><a href="./order-history.html">View order history</a></p>`;
-      } catch (err) {
-        console.error(err);
-        orderResult.textContent = 'Error placing order.';
-      } finally {
-        orderBtn.disabled = false;
-      }
-    });
-  
-  })();
