@@ -40,15 +40,15 @@
      <a href="./index.html">Mercury Movie Booker</a> 
     </nav>
 	<main>
-		<div id="searchBar">
-			<input type="text" placeholder="Search for a movie" id="searchText"></input>
+		<form id="searchBar">
+			<input type="text" placeholder="Search for a movie" id="searchText" name="search"></input>
 			<fieldset id="checkBoxes">
 				<legend>In Theaters?</legend>
-				<label for="currentMovies">Currently</label><input type="checkbox" id="currentMovies" checked></input>
-				<label for="currentMovies">Upcoming</label><input type="checkbox" id="upcomingMovies" checked></input>
+				<label for="currentMovies">Currently</label><input type="checkbox" id="currentMovies" name="currentMovies" checked></input>
+				<label for="currentMovies">Upcoming</label><input type="checkbox" id="upcomingMovies" name="upcomingMovies" checked></input>
 			</fieldset>
-			<button type="button" id="searchButton">Search!</button>
-		</div>
+			<input type="submit" method="get" id="searchButton" value="Search!"></input>
+		</form>
 		<div id="currentSearch">
 		<fieldset>
 			<legend id="currentSearchTitle">Nothing searched yet.</legend>
