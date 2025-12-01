@@ -17,7 +17,7 @@ documentTicketSales.appendChild(dataValues);
 dataValues.classList.add("numberList");
 documentTicketSales.classList.add("adminBoxRow");
 
-if (status.movieTicketSales.length == 0) dataTitles.innerHTML = "No movies in database."
+if (status.movieTicketSales.length == 0) dataTitles.innerHTML = "No ticket sales in database."
 else {
 	dataTitles.innerHTML = "Total Ticket Sales:";
 	dataValues.innerHTML = `${status.ticketCount}`;
@@ -36,7 +36,7 @@ documentTotalRevenue.appendChild(dataValues);
 dataValues.classList.add("numberList");
 documentTotalRevenue.classList.add("adminBoxRow");
 
-if (status.movieTicketSales.length == 0) dataTitles.innerHTML = "No movies in database."
+if (status.movieTicketSales.length == 0) dataTitles.innerHTML = "No recorded revenue in database."
 else {
 	dataTitles.innerHTML = "Total Revenue:";
 	dataValues.innerHTML = `\$${status.totalRevenue}`;
