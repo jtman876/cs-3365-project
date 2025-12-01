@@ -1,4 +1,30 @@
 <!DOCTYPE html>
+<style type="text/css">
+	#searchBar {
+		padding-top: 20pt;
+		display: flex;
+		flex-flow: row wrap;
+		
+		
+		font-family: Arial;
+		font-size: 1rem;
+		color: #000000;
+		
+		width: 95%;
+	}
+	#currentSearch {
+		font-family: Arial;
+		font-size: 1rem;
+		color: #000000;
+	}
+	
+	#checkBoxes {
+		display: flex;
+		flex-flow: row wrap;
+	}
+	
+</style>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -13,5 +39,21 @@
     <nav>
      <a href="./index.html">Mercury Movie Booker</a> 
     </nav>
+	<main>
+		<div id="searchBar">
+			<input type="text" placeholder="Search for a movie" id="searchText"></input>
+			<fieldset id="checkBoxes">
+				<legend>In Theaters?</legend>
+				<label for="currentMovies">Currently</label><input type="checkbox" id="currentMovies" checked></input>
+				<label for="currentMovies">Upcoming</label><input type="checkbox" id="upcomingMovies" checked></input>
+			</fieldset>
+			<button type="button" id="searchButton">Search!</button>
+		</div>
+		<div id="currentSearch">
+		<fieldset>
+			<legend id="currentSearchTitle">Nothing searched yet.</legend>
+			<div id="movieList"></div>
+		</fieldset>
+	</main>
   </body>
 </html>
