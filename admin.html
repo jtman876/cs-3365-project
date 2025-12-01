@@ -1,8 +1,36 @@
 <!DOCTYPE html>
 <style type="text/css">
-	.text {
+	.adminBox {
+		width: 95%;
+		min-width: 450pt;
+		font-family: Arial;
 		font-size: 2.5rem;
+		text-decoration: none;
+		color: rgba(175, 8, 2, 1);
+		border: 4px double red;
 	}
+	.adminRow {
+		margin-top: 50pt;
+		width: 45%;
+	}
+	.adminBoxRow {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: center;
+	}
+	.dataList {
+		font-family: monospace;
+		font-size: 1rem;
+		line-height: .4;
+		justify-content: left;
+		color: #000000;
+	}
+	.numberList {
+		margin-left: auto;
+		margin-right: 0;
+		text-align: right;
+	}
+	
 	.manageShow {
 		display: flex;
 		flex-flow: row wrap;
@@ -92,10 +120,23 @@
     <nav>
     <a href="./index.html">Mercury Movie Booker</a> 
     </nav>
-	<main class="text">
-	<br>
-	<u>Manage Shows</u>
-	<div id="showList"></div>
+	<main>
+	<div class="adminBoxRow">
+		<fieldset class="adminBox adminRow">
+			<legend>Tickets Sold</legend>
+			<div id="ticketsSoldData" class="dataList"></div>
+		</fieldset>
+		<fieldset class="adminBox adminRow">
+			<legend>Total Revenue</legend>
+			<div id="totalRevenueData" class="dataList"></div>
+		</fieldset>
+	</div>
+	<div class="adminBoxRow">
+		<fieldset class="adminBox">
+			<legend>Manage Shows</legend>
+			<div id="showList"></div>
+		</fieldset>
+	</div>
 	</main>
   </body>
 </html>

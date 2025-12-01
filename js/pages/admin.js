@@ -3,13 +3,55 @@ import {addMovie, updateMovie, removeMovie, getStatus} from '../auth.js'
 const status = await getStatus();
 console.log(status);
 
-
-
+// get HTML components
+const documentTicketSales = document.querySelector("#ticketsSoldData");
+const documentTotalRevenue = document.querySelector("#totalRevenueData");
 const documentShowList = document.querySelector("#showList");
 
+
+// Ticket Sales
+let dataTitles = document.createElement("div");
+let dataValues = document.createElement("div");
+documentTicketSales.appendChild(dataTitles);
+documentTicketSales.appendChild(dataValues);
+dataValues.classList.add("numberList");
+documentTicketSales.classList.add("adminBoxRow");
+
+if (status.movieTicketSales.length == 0) dataTitles.innerHTML = "No movies in database."
+else {
+	dataTitles.innerHTML = "Total Ticket Sales:";
+	dataValues.innerHTML = `${status.ticketCount}`;
+	for (const movie of status.movieTicketSales) {
+		dataTitles.innerHTML += `<p></p>${movie.title}:`;
+		dataValues.innerHTML += `<p></p>${movie.count}`;
+	}
+}
+
+
+// Total Revenue
+dataTitles = document.createElement("div");
+dataValues = document.createElement("div");
+documentTotalRevenue.appendChild(dataTitles);
+documentTotalRevenue.appendChild(dataValues);
+dataValues.classList.add("numberList");
+documentTotalRevenue.classList.add("adminBoxRow");
+
+if (status.movieTicketSales.length == 0) dataTitles.innerHTML = "No movies in database."
+else {
+	dataTitles.innerHTML = "Total Revenue:";
+	dataValues.innerHTML = `\$${status.totalRevenue}`;
+	for (const movie of status.movieTicketSales) {
+		dataTitles.innerHTML += `<p></p>${movie.title}:`;
+		dataValues.innerHTML += `<p></p>\$${movie.revenue}`;
+	}
+}
+
+// Manage Shows
 addMovieForm(null, documentShowList);
 for (const movie of status["movieList"]) addMovieForm(movie, documentShowList);
 
+
+// Helper functions
 function addMovieForm(movie, htmlElement) {
 	const movieContent = document.createElement("form");
 	movieContent.classList.add("manageShow");
@@ -269,8 +311,6 @@ function getFormData(node, clear, ...keys) {
 	});
 	return object;
 }
-
-
 function printCastInformation(cast_information) {
 	let string = "";
 	for (const castLine of cast_information) {
