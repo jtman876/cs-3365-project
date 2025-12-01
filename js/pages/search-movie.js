@@ -30,7 +30,7 @@ searchButton.onclick = async function () {
 function createMovieElement(movie) {
 	const element = document.createElement("a");
 	element.classList.add("movieOption");
-	element.setAttribute("href", `./movie-details.html?id-${movie.id}`);
+	element.setAttribute("href", `./movie-details.html?id=${movie.id}`);
 	element.innerHTML = `${movie.title}`;
 	
 	return element;
