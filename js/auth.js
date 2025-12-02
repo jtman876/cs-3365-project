@@ -300,6 +300,34 @@ export async function searchMovies(title) {
 }
 
 /**
+ * Get a movie by id
+ * @returns {Object[]|null} A movie with the matching id
+ */
+export async function getMovieById(id) {
+  const supabase = getSupabase();
+  const { data: movies, error} = await supabase
+    .from('movies')
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error searching movies: ', error)
+    return null;
+  }
+
+  return parseMovies(movies)[0];
+}
+
+/**
  * Receives ticket information and generates barcodes.
  * No need to send payment information to the database - it is automatically accepted
  * @param numSeats - The number of seats to book, which determines how many tickets are generated
