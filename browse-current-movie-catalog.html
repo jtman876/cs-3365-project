@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Browse Current Movie Catalog | Mercury Movie Booker</title>
-    <link href="css/style.css" rel="stylesheet">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
-    <script type="module" src="./js/app.js"></script>
-    <script type="module" src="./js/pages/browse-current-movie-catalog.js"></script>
-  </head>
-  <body>
-    <nav>
-     <a href="./index.html">Mercury Movie Booker</a> 
-    </nav>
-    <h1>Browse Current Movie Catalog</h1>
-    <section>
-      <h2>Lord of the Rings</h2>
-    </section>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Current Movie Catalog | Mercury Movie Booker</title>
+
+  <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav>
+    <a href="./index.html">Mercury Movie Booker</a>
+  </nav>
+
+  <h1>Browse Current Movie Catalog</h1>
+
+  <section class="catalog">
+    <!-- JavaScript will insert current movie cards here -->
+    <div id="current-movies-list"></div>
+  </section>
+
+  <!-- Put scripts here so the DOM is fully loaded before JS runs -->
+  <script type="module" src="./js/app.js"></script>
+  <script type="module" src="./js/pages/browse-current-movie-catalog.js"></script>
+</body>
+
 </html>
