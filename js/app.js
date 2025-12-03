@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { getUser, login, register, logoutUser, Role } from './auth.js'
-=======
 import { Role, getUser, login, register, logoutUser } from './auth.js'
->>>>>>> 84b155adb4ae356221ea81a972d71a6f2f18443a
 
 // Get user details from auth.js
 let user = await getUser();
@@ -10,11 +6,8 @@ let isAuthenticated = !(user === null);
 
 let nav = document.querySelectorAll('nav')[0];
 if (isAuthenticated) {
-<<<<<<< HEAD
-  if (user.role == Role.ADMIN) {
-=======
+	console.log(user.role);
   if (user.role === Role.ADMIN) {
->>>>>>> 84b155adb4ae356221ea81a972d71a6f2f18443a
     let admin = document.createElement('a');
     admin.text = 'Admin';
     admin.href = './admin.html';

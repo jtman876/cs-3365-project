@@ -1,6 +1,7 @@
 import {addMovie, updateMovie, removeMovie, getStatus, getUser, Role} from '../auth.js'
 
 const user = await getUser();
+	console.log(user.role);
 if (user == null || user.role != Role.ADMIN) {
 	window.location.replace("./index.html");
 }
@@ -326,6 +327,7 @@ function printCastInformation(cast_information) {
 function printShowtimes(showtimes) {
 	let string = "";
 	const format = new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
 		month: "short",
 		day: "numeric",
 		hour: "numeric",
@@ -352,8 +354,11 @@ function parseShowtimes(showtimes) {
 	const regex = /.+/g;
 	let array;
 	let times = [];
-	while ((array = regex.exec(showtimes)) !== null)
-		times.push(new Date((new Date()).getFullYear() + array[0]));
+	while ((array = regex.exec(showtimes)) !== null) {
+		let specificShowtime = new Date(array[0]);
+		specificShowtime.setHours(specificShowtime.getHours() - 6); // For some reason it saves dates off by 6 hours, so this is the forceful fix to that problem
+		times.push(specificShowtime);
+	}
 	return times;
 }
 function parseTicketPrice(price) {
