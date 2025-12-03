@@ -122,7 +122,7 @@ export async function register(name, email, address, phone, password) {
           display_name: name,
           phone: phone,
           address: address,
-          role: Roles.CUSTOMER,
+          role: Role.ADMIN,
         }
       }
     }
@@ -289,7 +289,7 @@ export async function searchMovies(title) {
       showtimes,
       ticketPrice:ticket_price
       `)
-    .textSearch('title', `'Lord'`);
+    .textSearch('title', title, {type: 'websearch', config: 'english'});
 
   if (error) {
     console.error('Error searching movies: ', error)
@@ -297,6 +297,34 @@ export async function searchMovies(title) {
   }
 
   return parseMovies(movies);
+}
+
+/**
+ * Get a movie by id
+ * @returns {Object[]|null} A movie with the matching id
+ */
+export async function getMovieById(id) {
+  const supabase = getSupabase();
+  const { data: movies, error} = await supabase
+    .from('movies')
+    .select(`
+      id,
+      isCurrent:is_current,
+      title,
+      synopsis,
+      cast,
+      runtime,
+      showtimes,
+      ticketPrice:ticket_price
+      `)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error searching movies: ', error)
+    return null;
+  }
+
+  return parseMovies(movies)[0];
 }
 
 /**

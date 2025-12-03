@@ -1,23 +1,17 @@
 import { login } from '../auth.js'
 
 const form = document.querySelector('form');
-form.addEventListener('submit', function(event) {
-  // What does this do?
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const email = form.elements['email'].value;
-  // TODO: get the rest of the form elements
+  const password = form.elements['password'].value;
 
-  // let isAuthenticated = login(email, /*...*/);
-  let isAuthenticated = true; // replace this line
+  let isAuthenticated = await login(email, password);
 
   if (isAuthenticated) {
     window.location.replace('./index.html');
-
   } else {
-    // TODO: Display error message
+    alert("Error logging in");
   }
-
-
-
-})
+});

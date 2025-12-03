@@ -1,4 +1,77 @@
 <!DOCTYPE html>
+<style>
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  h1 {
+    color: rgba(233, 8, 2, 1);
+  }
+
+  section {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    padding: .75rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+
+  input[type="submit"] {
+    padding: 0.75rem;
+    background-color: rgba(233, 8, 2, 1);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  input[type="submit"]:hover {
+    background-color: rgba(183, 3, 1, 1);
+  }
+
+  .modifiable input:focus {
+    outline: none;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  @media (max-width: 500px) {
+    section {
+      padding: 1.5rem;
+    }
+  }
+</style>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -10,27 +83,30 @@
   </head>
   <body>
     <nav>
-     <a href="./index.html">Mercury Movie Booker</a> 
+     <a href="./index.html">Mercury Movie Booker</a> <div></div>
     </nav>
-    <!-- TODO: can use novalidate for the form to implement custom validation-->
-    <form>
-      <label for="name">Name: </label>
-      <input type="text" name="name" required>
+    <main>
+      <h1>Register</h1>
+      <section>
+       <form>
+        <label for="name">Name </label>
+        <input type="text" name="name" required>
 
-      <label for="email">Email Address: </label>
-      <input type="text" name="email" value="">
+        <label for="email">Email Address </label>
+        <input type="text" name="email" value="">
 
-      <label for="address">Home Address: </label>
-      <input type="text" name="address" value="">
+        <label for="address">Home Address </label>
+        <input type="text" name="address" value="">
 
-      <label for="phone">Phone Number: </label>
-      <input type="text" name="phone" value="">
+        <label for="phone">Phone Number </label>
+        <input type="text" name="phone" value="">
 
-      <label for="password">Password: </label>
-      <input type="text" name="password" value="">
+        <label for="password">Password </label>
+        <input type="password" name="password" value="">
 
-      <input type="submit" value="Register">
-    </form>
-    <a href="./index.html">Register</a>
+        <input type="submit" value="Register">
+      </form> 
+      </section>
+    </main>
   </body>
 </html>
