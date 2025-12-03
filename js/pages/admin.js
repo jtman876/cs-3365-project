@@ -1,7 +1,7 @@
 import {addMovie, updateMovie, removeMovie, getStatus, getUser, Role} from '../auth.js'
 
 const user = await getUser();
-if (user == null) {
+if (user == null || user.role != Role.ADMIN) {
 	window.location.replace("./index.html");
 }
 

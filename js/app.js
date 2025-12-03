@@ -1,4 +1,4 @@
-import { getUser, login, register, logoutUser } from './auth.js'
+import { getUser, login, register, logoutUser, Role } from './auth.js'
 
 // Get user details from auth.js
 let user = await getUser();
@@ -8,7 +8,7 @@ let isAuthenticated = !(user === null);
 // Build the Navigation background
 let nav = document.querySelectorAll('nav')[0];
 if (isAuthenticated) {
-  if (user.admin || true) {
+  if (user.role == Role.ADMIN) {
     let admin = document.createElement('a');
     admin.text = 'Admin';
     admin.href = './admin.html';
