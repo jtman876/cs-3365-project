@@ -1,4 +1,73 @@
 <!DOCTYPE html>
+<style>
+   body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .orders-container {
+
+  }
+
+  .order-list {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .order-card {
+    background-color: #ff8383;
+    max-width: 1200px;
+    border: 1px solid red;
+    border-radius: 12px;
+    margin: 3rem 0;
+    padding: 1rem;
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  button {
+    padding: 0.5rem 2.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    background-color: #ffcdcd;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    background-color: white;
+  }
+
+  button:active {
+    transform: translateY(0);
+  }
+
+  button:focus-visible {
+    outline: 3px solid #005fcc;
+  }
+  
+  .buttons {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    align-items: center;
+  }
+</style>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
