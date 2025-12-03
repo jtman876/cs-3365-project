@@ -42,7 +42,7 @@ nav a:hover {
   color: white;
   background: rgba(0,0,0,.1);
   border: 1px solid rgba(233, 8, 2, 1);
-  padding: 3px 9px;
+  padding: 4px 9px;
   flex-shrink: 0;
 }
 

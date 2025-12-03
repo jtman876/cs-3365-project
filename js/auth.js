@@ -122,7 +122,7 @@ export async function register(name, email, address, phone, password) {
           display_name: name,
           phone: phone,
           address: address,
-          role: Roles.CUSTOMER,
+          role: Role.ADMIN,
         }
       }
     }

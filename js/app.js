@@ -1,14 +1,12 @@
-import { getUser, login, register, logoutUser } from './auth.js'
+import { Role, getUser, login, register, logoutUser } from './auth.js'
 
 // Get user details from auth.js
 let user = await getUser();
 let isAuthenticated = !(user === null);
 
-// TODO: move to components/navbar.js and fix navbar elements shifting/flashing on load
-// Build the Navigation background
 let nav = document.querySelectorAll('nav')[0];
 if (isAuthenticated) {
-  if (user.admin || true) {
+  if (user.role === Role.ADMIN) {
     let admin = document.createElement('a');
     admin.text = 'Admin';
     admin.href = './admin.html';
@@ -36,11 +34,6 @@ if (isAuthenticated) {
   let loginButton = document.createElement('a');
   loginButton.text = 'Log in';
   loginButton.href = './login.html'
-  // TODO: remove later - temporarily login by hovering over
-  loginButton.addEventListener("mouseover", async (event) => {
-    await login("jtman876@gmail.com", "johndoe");
-    window.location.reload();
-  })
   nav.appendChild(loginButton);
 
   let register = document.createElement('a');
@@ -48,17 +41,3 @@ if (isAuthenticated) {
   register.href = './register.html'
   nav.appendChild(register);
 }
-
-// TODO: make the body or container hidden until javascript is finished
- /*
-const styleSheet = document.styleSheets[0];
-// Set nav text to red, then  make the document visible
-for (let i = 0; i < styleSheet.cssRules.length; i++) {
-  const rule = styleSheet.cssRules[i];
-  if (rule.selectorText === 'body') {
-    rule.style.visibility = 'visible';
-    break;
-  }
-}
-*/
-
