@@ -1,38 +1,68 @@
 <!DOCTYPE html>
-<style type="text/css">
-  section {
+<style>
+  main {
+    flex: 1;
     display: flex;
-    flex-flow: column wrap;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding: 2rem;
   }
+
+  h1 {
+    margin-bottom: 1.5rem;
+    color: rgba(233, 8, 2, 1);
+  }
+
+  section {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
   form {
     display: flex;
-    flex-flow: column wrap;
-    align-items: center;
+    flex-direction: column;
   }
 
   label {
-    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
   }
 
-  input {
-    border: 1px solid red;
-    display: inline-block;
-    max-width: 200px;
-    margin-bottom: 50px;
-    padding: 0;
+  input[type="text"],
+  input[type="password"] {
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
   }
 
-  .modifiable input:focus {
-    outline: none;
-
+  input[type="submit"] {
+    padding: 0.75rem;
+    background-color: rgba(233, 8, 2, 1);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
-  input:focus {
-    outline: none;
+  input[type="submit"]:hover {
+    background-color: rgba(183, 3, 1, 1);
   }
 
+  @media (max-width: 500px) {
+    section {
+      padding: 1.5rem;
+    }
+  }
 </style>
 <html lang="en">
   <head>
@@ -49,10 +79,8 @@
      <a href="./index.html">Mercury Movie Booker</a> 
     </nav>
     <main>
-      <section>
-        <h2>Profile</h2> 
-        <button type="">Edit Profile</button>
-      </section>
+      <h1>Profile</h1> 
+      <button type="">Edit Profile</button>
       <section>
         <form class="modifiable">
           <label for="name">Name: </label>

@@ -1,4 +1,69 @@
 <!DOCTYPE html>
+
+<style>
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  h1 {
+    margin-bottom: 1.5rem;
+    color: rgba(233, 8, 2, 1);
+  }
+
+  section {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+
+  input[type="submit"] {
+    padding: 0.75rem;
+    background-color: rgba(233, 8, 2, 1);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  input[type="submit"]:hover {
+    background-color: rgba(183, 3, 1, 1);
+  }
+
+  @media (max-width: 500px) {
+    section {
+      padding: 1.5rem;
+    }
+  }
+</style>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -10,8 +75,21 @@
   </head>
   <body>
     <nav>
-     <a href="./index.html">Mercury Movie Booker</a> 
+     <a href="./index.html">Mercury Movie Booker</a> <div></div>
     </nav>
-    <a href="./index.html">Log In</a>
+    <main>
+      <h1>Login</h1>
+      <section>
+        <form>
+          <label for="email">Email Address: </label>
+          <input type="text" name="email" placeholder="Email" required>
+
+          <label for="password">Password: </label>
+          <input type="password" name="password" placeholder="Password" required>
+
+          <input type="submit" value="Log in">
+        </form>
+      </section>
+    </main>
   </body>
 </html>
