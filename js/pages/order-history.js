@@ -24,17 +24,39 @@ import { getUser, getOrderHistory } from '../auth.js'
       tickets.forEach(t => {
         const card = document.createElement('div');
         card.className = 'order-card';
-        const movieTitle = t.movie?.title ?? `Movie #${t.movieId}`;
+        const movieTitle = t.movieTitle;
         const showtime = t.showtime ? new Date(t.showtime).toLocaleString() : 'Unknown showtime';
         const createdAt = t.createdAt ? new Date(t.createdAt).toLocaleString() : '';
         card.innerHTML = `
-          <h3>${movieTitle}</h3>
+          <h3 style="margin-top:0;">${movieTitle}</h3>
           <p><strong>Showtime:</strong> ${showtime}</p>
           <p><strong>Theater:</strong> ${t.theater}</p>
           <p><strong>Price:</strong> $${(t.price ?? 0).toFixed(2)}</p>
-          <p><strong>Order ID / Ticket:</strong> ${t.id}</p>
-          <p><small>Ordered: ${createdAt}</small></p>
+          <p><strong>Barcode:</strong> ${t.id}</p>
+          ${createdAt ? `<p style="margin-top:-0.5rem;"><small>Ordered: ${createdAt}</small></p>` : ""}
         `;
+
+        const buttons = document.createElement('div');
+        buttons.className = 'buttons';
+
+        let displayButton = document.createElement('button');
+        displayButton.textContent = 'Display';
+
+        let printButton = document.createElement('button');
+        printButton.textContent = 'Print';
+
+        const copy = card.cloneNode(true);
+        displayButton.addEventListener('click', () => {
+          displayTicket(copy);
+        });
+
+        printButton.addEventListener('click', () => {
+          printTicket(copy);
+        });
+        
+        buttons.append(displayButton, printButton)
+        card.append(buttons);
+
         list.appendChild(card);
       });
   
@@ -44,3 +66,40 @@ import { getUser, getOrderHistory } from '../auth.js'
       container.innerHTML = '<p>Error loading orders.</p>';
     }
   })();
+
+function displayTicket(ticket) {
+  const displayWindow = window.open("", "", "width=800, height=600");
+  displayWindow.document.write(`
+    <html>
+      <head>
+        <title>Print</title>
+        <style>
+          body { font-family: Arial; margin: 20px; }
+        </style>
+      </head>
+      <body>${ticket.innerHTML}</body>
+    </html>
+  `);
+  displayWindow.document.close();
+  displayWindow.focus();
+}
+
+function printTicket(ticket) {
+  const printWindow = window.open("", "", "width=800, height=600");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Print</title>
+        <style>
+          body { font-family: Arial; margin: 20px; }
+        </style>
+      </head>
+      <body>${ticket.innerHTML}</body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+
