@@ -122,7 +122,7 @@ export async function register(name, email, address, phone, password) {
           display_name: name,
           phone: phone,
           address: address,
-          role: Role.ADMIN,
+          role: Role.CUSTOMER,
         }
       }
     }
@@ -154,7 +154,7 @@ export async function logoutUser() {
  * Update the user's information
  * @returns {boolean} Whether the update was successful.
  */
-export async function updateProfile(name, email, address, phone) {
+export async function updateProfile(name, email, address, phone, password) {
   const supabase = getSupabase();
   const user = await getUser();
   if (!user) {
@@ -167,6 +167,7 @@ export async function updateProfile(name, email, address, phone) {
       display_name: name,
       address: address,
       phone: phone,
+	  password: password,
       role: user.role
     }
   })
