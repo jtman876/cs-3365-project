@@ -58,7 +58,6 @@ async function fillProfile() {
   emailInput.value = user.email;
   addressInput.value = user.address;
   phoneInput.value = user.phone;
-  passwordInput.value = user.password;
 }
 
 function createMessageAfter(element, content, color) {

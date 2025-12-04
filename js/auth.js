@@ -2,7 +2,6 @@
  * @fileoverview Helper functions for accessing Supabase.
  * Typically, you should first check if the user is logged in with getUser.
  * Then, you can add or remove objects from the database with these functions.
- * TODO: refactor database table names into an enum
  */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -33,41 +32,9 @@ export const TicketStatus = Object.freeze({
 let supabaseClient;
 let authSubscription;
 
-// movie1 is an example of how to structure a movie for the database
-let movie1 = {
-  id: 1, // Don't need to set an id.
-  isCurrent: true,
-  title: "Lord of the Rings",
-  synopsis: "Synposis goes here",
-  cast: [
-    ["Actor 1", "Character 1"],
-    ["Actor 2", "Character 2"],
-  ],
-  ticketPrice: 2.44,
-  runtime: "1 hr 28 min",
-  showtimes: [
-    new Date(),
-  ]
-}
-
-// TODO: Remove later - testing movie retrieval from Supabase
-let user1 = await getUser();
-if (user1) {
-  // let movies = await getCurrentMovies();
-  // let movies = await searchMovies('Lord');
-  // if (movies) {
-    // let ticket = await orderTickets(d[0], d[0].showtimes[0], Theater.LUBBOCK, 1);
-    // let tickets = await getOrderHistory();
-    // console.log(await getReviews(movies[0].id))
-    // updateProfile("John Doe", "jtman876@gmail.com", "1234 56th St.", "+12223334444")
-    // submitReview(movies[0].id, 4, 'This is the greatest movie I\'ve ever seen!');
-  // }
-}
-
 /**
  * Check if a user is logged in
  * @returns {User|null} Returns the authenticated user with their information, or null if there is no user logged in
- * TODO: change to auth.getUser
  */
 export async function getUser() {
   const supabase = getSupabase();
@@ -161,16 +128,22 @@ export async function updateProfile(name, email, address, phone, password) {
     console.log("Unable to update profile: user not found");
     return false;
   }
-  const { data, error } = await supabase.auth.updateUser({
+
+  let newUser = {
     email: email,
     data: {
       display_name: name,
       address: address,
       phone: phone,
-	  password: password,
       role: user.role
     }
-  })
+  }
+
+  if (password !== "") {
+    newUser.password = password;
+  }
+
+  const { data, error } = await supabase.auth.updateUser(newUser);
   
   if (error) {
     console.log(error);
@@ -333,7 +306,6 @@ export async function getMovieById(id) {
  * No need to send payment information to the database - it is automatically accepted
  * @param numSeats - The number of seats to book, which determines how many tickets are generated
  * @returns {number[]|null} The unique barcodes for the tickets ordered, or null if no tickets were successfully generated
- * TODO: consider changing to take movieId
  */
 export async function orderTickets(movie, showtime, theater, numSeats) {
   const supabase = getSupabase();
@@ -618,5 +590,3 @@ function parseMovies(movies) {
   });
   return movies;
 }
-
- // TODO: policy ((auth.jwt() ->> 'role'::text) = ANY (ARRAY['Customer'::text, 'Admin'::text]))
