@@ -53,6 +53,11 @@ async function loadMovieData() {
   }
 
   document.getElementById('order-btn').addEventListener('click', async () => {
+    if (numInput.value > 10) {
+      alert('Max number of tickets is 10!');
+      return;
+    }
+
     const result = await orderTickets(movie, new Date(showtimeSelect.value), Theater[theaterSelect.value], numInput.value);
     if (result) {
       alert("Ticket ordered successfully!");
