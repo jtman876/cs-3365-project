@@ -90,7 +90,8 @@ export async function register(name, email, address, phone, password) {
         phone: phone,
         address: address,
         role: Role.CUSTOMER,
-      }
+      },
+	  emailRedirectTo: undefined
     }
   });
 
@@ -98,7 +99,7 @@ export async function register(name, email, address, phone, password) {
     console.log(error);
     return false;
   }
-
+  await supabase.auth.signOut({ scope: 'global' });
   return true;
 }
 
