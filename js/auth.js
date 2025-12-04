@@ -82,18 +82,17 @@ export async function login(email, password) {
 export async function register(name, email, address, phone, password) {
   const supabase = getSupabase();
   const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          display_name: name,
-          phone: phone,
-          address: address,
-          role: Role.CUSTOMER,
-        }
+    email: email,
+    password: password,
+    options: {
+      data: {
+        display_name: name,
+        phone: phone,
+        address: address,
+        role: Role.CUSTOMER,
       }
     }
-  )
+  });
 
   if (error) {
     console.log(error);
