@@ -9,6 +9,8 @@ let addressInput = document.getElementsByName('address')[0];
 inputs.push(addressInput);
 let phoneInput = document.getElementsByName('phone')[0];
 inputs.push(phoneInput);
+let passwordInput = document.getElementsByName('password')[0];
+inputs.push(passwordInput);
 
 let modifiable = document.getElementsByClassName("modifiable")[0];
 let profileButton = document.querySelectorAll("button")[0];
@@ -32,7 +34,7 @@ submitForm.addEventListener('click', async (event) => {
   }
   submitForm.style.display = "none";
 
-  let response = await updateProfile(nameInput.value, emailInput.value, addressInput.value, phoneInput.value);
+  let response = await updateProfile(nameInput.value, emailInput.value, addressInput.value, phoneInput.value, passwordInput.value);
   await fillProfile(); 
 
   if (response) {
@@ -56,6 +58,7 @@ async function fillProfile() {
   emailInput.value = user.email;
   addressInput.value = user.address;
   phoneInput.value = user.phone;
+  passwordInput.value = user.password;
 }
 
 function createMessageAfter(element, content, color) {
