@@ -3,6 +3,7 @@ import { Theater, getUser, getMovieById, getReviews, submitReview, orderTickets 
 const urlParams = new URLSearchParams(window.location.search);
 const movieId = urlParams.get('id');
 const movieDetails = document.getElementById('movie-container');
+const orderContainer = document.getElementById('order-container');
 const reviewsSection = document.getElementById('reviews-list');
 const reviewSubmitBtn = document.getElementById('submit-review');
 const showtimeSelect = document.getElementById('showtime-select');
@@ -21,6 +22,10 @@ async function loadMovieData() {
   if (!movie) {
     movieDetails.innerHTML = "<p>Error loading movie details.</p>";
     return;
+  }
+
+  if (!movie.isCurrent) {
+    orderContainer.style.display = "none";
   }
 
   movieDetails.innerHTML = `
